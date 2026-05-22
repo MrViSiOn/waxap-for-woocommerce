@@ -1,0 +1,30 @@
+# ========== Composer / PHP ==========
+/vendor/
+composer.lock
+
+# ========== Node (para build de assets) ==========
+node_modules/
+npm-debug.log*
+
+# ========== Build ==========
+build/
+dist/
+
+# ========== Editores / OS ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ========== WordPress ==========
+*.log
+
+# ========== Tests ==========
+/tests/_output/
+.phpunit.result.cache
+
+# ========== Secrets ==========
+.env
+.env.local

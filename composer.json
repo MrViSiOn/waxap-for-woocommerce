@@ -1,0 +1,19 @@
+{
+    "name": "wa-notifier/wa-notifier-wp-plugin",
+    "description": "WA Notifier — WhatsApp notifications for WooCommerce",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "WaNotifier\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "vendor-dir": "vendor"
+    }
+}

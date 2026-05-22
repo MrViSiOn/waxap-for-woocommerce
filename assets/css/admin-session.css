@@ -1,0 +1,112 @@
+/* WA Notifier — Admin styles */
+
+/* Modal overlay */
+#wa-notifier-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+}
+
+#wa-notifier-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wa-notifier-modal-box {
+    position: relative;
+    background: #fff;
+    border-radius: 6px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.wa-notifier-modal-box h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+#wa-notifier-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+#wa-notifier-modal-close:hover {
+    color: #000;
+}
+
+/* QR image */
+#wa-notifier-qr-wrap {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 1rem 0;
+}
+
+#wa-notifier-qr-img {
+    max-width: 240px;
+    height: auto;
+    display: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+#wa-notifier-qr-loading {
+    color: #666;
+    font-style: italic;
+}
+
+/* Status dot */
+.wa-notifier-status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #999;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.wa-notifier-status-dot.wan-green  { background: #46b450; }
+.wa-notifier-status-dot.wan-red    { background: #dc3232; }
+.wa-notifier-status-dot.wan-yellow { background: #f0b849; }
+
+/* Spinner positioning */
+.wa-notifier-spinner {
+    visibility: hidden;
+}
+
+.wa-notifier-spinner.is-active {
+    visibility: visible;
+}
+
+/* Test message section */
+#wa-notifier-test-wrap {
+    margin-top: 1.5rem;
+}
+
+#wa-notifier-test-wrap hr {
+    margin-bottom: 1.5rem;
+}
+
+#wa-notifier-test-result {
+    margin-top: 0.5rem;
+    max-width: 600px;
+}

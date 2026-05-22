@@ -1,0 +1,121 @@
+# ============================================================
+# WA Notifier — Entorno local de desarrollo del plugin
+# ============================================================
+#
+# Arranca un WordPress + WooCommerce limpio en local con el plugin
+# montado por volumen (cambios en PHP se reflejan al instante, sin rebuild).
+#
+# Servicios:
+#   - wordpress    http://localhost:8080
+#   - mysql        (interno, puerto 3306 expuesto a localhost por si quieres
+#                   conectarte con TablePlus/DBeaver)
+#   - mailhog      http://localhost:8025  (inspector de emails de WP)
+#
+# Uso:
+#   docker compose up -d
+#   .\bin\bootstrap-wp.ps1     (Windows PowerShell)
+#   ./bin/bootstrap-wp.sh      (Git Bash / WSL)
+#
+# Reset completo (BORRA TODO, incluido el WP instalado):
+#   docker compose down -v
+#
+# La red 'wa-notifier-dev' es EXTERNA porque la comparte con el wrapper
+# (que vive en el otro repo). Crear la red ANTES del primer 'up':
+#   docker network create wa-notifier-dev
+#
+# Si no necesitas comunicar plugin ↔ wrapper en local (ej. solo desarrollas
+# el plugin), puedes cambiar 'external: true' por borrarlo y se creará
+# automáticamente.
+
+services:
+  wordpress:
+    image: wordpress:6.8-php8.2-apache
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      # Configura WP para usar MailHog como SMTP (vía un MU plugin abajo)
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG', true);
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        define('SCRIPT_DEBUG', true);
+        define('WP_ENVIRONMENT_TYPE', 'development');
+    volumes:
+      # Persistencia de WP (uploads, plugins instalados desde el admin, etc.)
+      - wordpress_data:/var/www/html
+      # Montaje del plugin: el código del repo es directamente el plugin instalado.
+      # ATENCIÓN: el path es relativo a este docker-compose.yml.
+      # Estructura asumida: este archivo está en wa-notifier-wp-plugin/
+      - .:/var/www/html/wp-content/plugins/wa-notifier:rw
+      # MU plugin para forzar SMTP a MailHog
+      - ./.docker/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - wa-notifier-dev
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    command: --skip-ssl
+    ports:
+      - "3307:3306"  # 3307 en host para no chocar con otros MySQL locales
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - wa-notifier-dev
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # UI web del inspector
+    networks:
+      - wa-notifier-dev
+
+  # WP-CLI: contenedor de utilidad para ejecutar comandos sobre WP.
+  # No se queda corriendo. Uso: docker compose run --rm wpcli wp plugin list
+  wpcli:
+    image: wordpress:cli-php8.2
+    profiles: ["tools"]  # no arranca por defecto, solo bajo demanda
+    user: "33:33"  # www-data
+    volumes:
+      - wordpress_data:/var/www/html
+      - .:/var/www/html/wp-content/plugins/wa-notifier:rw
+    networks:
+      - wa-notifier-dev
+    depends_on:
+      - wordpress
+      - mysql
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+
+volumes:
+  wordpress_data:
+  mysql_data:
+
+networks:
+  wa-notifier-dev:
+    # External: la red la creas a mano con `docker network create wa-notifier-dev`.
+    # Esto permite que el wrapper (en otro docker-compose) se conecte a la misma red.
+    external: true
