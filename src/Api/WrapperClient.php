@@ -86,6 +86,24 @@ final class WrapperClient {
     }
 
     /**
+     * Consulta el estado de activación de un tenant (polling post-pago Stripe).
+     *
+     * @return array{status:string,apiKey?:string,hmacSecret?:string}|WP_Error
+     */
+    public function get_auth_status( string $tenant_id ): array|WP_Error {
+        return $this->request( 'GET', "/v1/auth/status/{$tenant_id}" );
+    }
+
+    /**
+     * Obtiene la URL del Payment Link de Stripe con tenantId incrustado.
+     *
+     * @return array{url:string}|WP_Error
+     */
+    public function get_checkout_url( string $tenant_id ): array|WP_Error {
+        return $this->request( 'GET', '/v1/billing/checkout-url', query: [ 'tenantId' => $tenant_id ] );
+    }
+
+    /**
      * Envía un evento de cambio de estado de pedido al wrapper, firmado con HMAC.
      *
      * @param array<string,mixed> $payload
@@ -107,8 +125,9 @@ final class WrapperClient {
     }
 
     /**
-     * @param array<string,mixed> $body
+     * @param array<string,mixed>  $body
      * @param array<string,string> $extra_headers
+     * @param array<string,string> $query  Parámetros de query string para peticiones GET.
      * @return array<string,mixed>|WP_Error
      */
     private function request(
@@ -117,8 +136,12 @@ final class WrapperClient {
         array $body = [],
         bool $auth = false,
         array $extra_headers = [],
+        array $query = [],
     ): array|WP_Error {
-        $url  = $this->base_url . $path;
+        $url = $this->base_url . $path;
+        if ( ! empty( $query ) ) {
+            $url = add_query_arg( $query, $url );
+        }
         $args = [
             'method'  => $method,
             'timeout' => 10,

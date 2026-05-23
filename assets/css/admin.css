@@ -935,3 +935,49 @@
     margin-top: 0.5rem;
     max-width: 560px;
 }
+
+/* ── Onboarding wizard ───────────────────────────────────── */
+
+.wan-ob-steps-nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 28px;
+    max-width: 320px;
+}
+
+.wan-ob-step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #888;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+
+.wan-ob-step-dot.active {
+    background: var(--wax-green, #25D366);
+    color: #fff;
+}
+
+.wan-ob-step-dot.done {
+    background: var(--wax-green-dark, #1aaa50);
+    color: #fff;
+}
+
+.wan-ob-step-line {
+    flex: 1;
+    height: 2px;
+    background: #e0e0e0;
+    min-width: 40px;
+}
+
+.wan-ob-step {
+    max-width: 560px;
+}

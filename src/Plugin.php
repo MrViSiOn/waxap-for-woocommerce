@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace WaNotifier;
 
 use WaNotifier\Admin\AdminMenu;
+use WaNotifier\Admin\Onboarding;
 use WaNotifier\Ajax\SessionAjax;
 use WaNotifier\Checkout\CheckoutOptIn;
 use WaNotifier\Emails\OrderEmails;
@@ -28,6 +29,9 @@ final class Plugin {
 
         $ajax = new SessionAjax();
         $ajax->register();
+
+        $onboarding = new Onboarding();
+        $onboarding->register();
 
         add_action( 'woocommerce_loaded', function () {
             ( new OrderEvents() )->register();
@@ -85,5 +89,26 @@ final class Plugin {
                 'sessionId'      => Settings::get( 'session_id' ),
             ],
         );
+
+        // Wizard de onboarding (solo cuando no está conectado)
+        if ( ! Settings::is_connected() ) {
+            wp_enqueue_script(
+                'wa-notifier-onboarding',
+                WA_NOTIFIER_URL . 'assets/js/admin-onboarding.js',
+                [ 'jquery' ],
+                $ver,
+                true,
+            );
+
+            wp_localize_script(
+                'wa-notifier-onboarding',
+                'waxapOnboarding',
+                [
+                    'nonce'   => wp_create_nonce( 'wa_notifier_ajax' ),
+                    'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                    'step'    => Settings::get( 'tenant_id' ) ? '2' : '1',
+                ],
+            );
+        }
     }
 }
