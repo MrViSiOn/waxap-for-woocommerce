@@ -16,7 +16,7 @@ final class Settings {
 
     /** @var array<string,string> Valores por defecto. */
     private const DEFAULTS = [
-        'wrapper_url'          => 'http://host.docker.internal:3000',
+        'wrapper_url'          => 'https://api.waxap.shop',
         'api_key'              => '',
         'tenant_id'            => '',
         'session_id'           => '',

@@ -26,7 +26,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
             <?php esc_html_e( 'Servidor Waxap', 'wa-notifier' ); ?>
             <span class="wan-connection-badge wan-connection-badge--ok"><?php esc_html_e( 'Conectado', 'wa-notifier' ); ?></span>
         </h2>
-        <p><?php esc_html_e( 'Tu tienda está conectada al servidor. Puedes actualizar los datos de acceso si es necesario.', 'wa-notifier' ); ?></p>
+        <p><?php esc_html_e( 'Tu tienda está conectada al servidor. Puedes actualizar tu API Key si es necesario.', 'wa-notifier' ); ?></p>
     </div>
 
     <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" autocomplete="off">
@@ -34,15 +34,6 @@ if ( isset( $_GET['updated'] ) ) : ?>
         <?php wp_nonce_field( 'wa_notifier_save_connection' ); ?>
 
         <div class="wan-field-rows" style="max-width:620px;">
-            <div class="wan-field-row">
-                <label for="wan-wrapper-url" class="wan-field-label">
-                    <?php esc_html_e( 'URL del servidor', 'wa-notifier' ); ?>
-                </label>
-                <input type="url" id="wan-wrapper-url" name="wrapper_url"
-                       value="<?php echo esc_attr( $wrapper_url ); ?>"
-                       class="regular-text wan-field-input" autocomplete="off" required>
-            </div>
-
             <div class="wan-field-row">
                 <label for="wan-api-key" class="wan-field-label">
                     <?php esc_html_e( 'API Key', 'wa-notifier' ); ?>
@@ -89,7 +80,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
             <?php esc_html_e( 'Servidor Waxap', 'wa-notifier' ); ?>
             <span class="wan-connection-badge wan-connection-badge--off"><?php esc_html_e( 'No conectado', 'wa-notifier' ); ?></span>
         </h2>
-        <p><?php esc_html_e( 'Introduce la URL del servidor y tu API Key para conectar la tienda.', 'wa-notifier' ); ?></p>
+        <p><?php esc_html_e( 'Introduce tu API Key para conectar la tienda con Waxap.', 'wa-notifier' ); ?></p>
     </div>
 
     <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" autocomplete="off">
@@ -97,16 +88,6 @@ if ( isset( $_GET['updated'] ) ) : ?>
         <?php wp_nonce_field( 'wa_notifier_save_connection' ); ?>
 
         <div class="wan-field-rows" style="max-width:620px;">
-            <div class="wan-field-row">
-                <label for="wan-wrapper-url" class="wan-field-label">
-                    <?php esc_html_e( 'URL del servidor', 'wa-notifier' ); ?>
-                    <span class="wan-field-hint"><?php esc_html_e( 'Ej: https://waxap.shop', 'wa-notifier' ); ?></span>
-                </label>
-                <input type="url" id="wan-wrapper-url" name="wrapper_url"
-                       value="<?php echo esc_attr( $wrapper_url ); ?>"
-                       class="regular-text wan-field-input" autocomplete="off" required>
-            </div>
-
             <div class="wan-field-row">
                 <label for="wan-api-key" class="wan-field-label">
                     <?php esc_html_e( 'API Key', 'wa-notifier' ); ?>
