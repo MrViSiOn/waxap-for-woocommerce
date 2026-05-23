@@ -1,0 +1,38 @@
+/* ============================================================
+   Waxap — Checkout opt-in styles
+   ============================================================ */
+
+.waxap-checkout-consent {
+    margin: 0 0 16px;
+}
+
+.waxap-checkout-consent .checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.waxap-checkout-consent .woocommerce-form__input-checkbox {
+    margin-top: 3px;
+    flex-shrink: 0;
+    accent-color: #25d366;
+    width: 16px;
+    height: 16px;
+}
+
+.waxap-consent-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #3c434a;
+}
+
+.waxap-consent-icon {
+    width: 18px;
+    height: 18px;
+    fill: #25d366;
+    flex-shrink: 0;
+}

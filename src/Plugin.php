@@ -12,6 +12,7 @@ namespace WaNotifier;
 
 use WaNotifier\Admin\AdminMenu;
 use WaNotifier\Ajax\SessionAjax;
+use WaNotifier\Checkout\CheckoutOptIn;
 use WaNotifier\Emails\OrderEmails;
 use WaNotifier\Orders\OrderEvents;
 
@@ -23,13 +24,31 @@ final class Plugin {
             add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
         }
 
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_checkout_assets' ] );
+
         $ajax = new SessionAjax();
         $ajax->register();
 
         add_action( 'woocommerce_loaded', function () {
             ( new OrderEvents() )->register();
             ( new OrderEmails() )->register();
+            ( new CheckoutOptIn() )->register();
         } );
+    }
+
+    public function enqueue_checkout_assets(): void {
+        if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
+            return;
+        }
+
+        $ver = defined( 'WP_DEBUG' ) && WP_DEBUG ? (string) time() : WA_NOTIFIER_VERSION;
+
+        wp_enqueue_style(
+            'wa-notifier-checkout',
+            WA_NOTIFIER_URL . 'assets/css/checkout.css',
+            [],
+            $ver,
+        );
     }
 
     public function enqueue_admin_assets( string $hook ): void {

@@ -41,10 +41,10 @@ final class OrderEvents {
             return;
         }
 
-        // MVP: si el meta no está definido, asumimos opt-in true para las tiendas piloto.
-        // Fase 1 añadirá checkbox de consentimiento en el checkout.
+        // Pedidos nuevos llevan el meta del checkbox del checkout.
+        // Pedidos anteriores a la activación del checkbox no tienen el meta → asumimos opt-in.
         $opt_in_meta = $order->get_meta( '_wa_notifier_opt_in', true );
-        $opt_in      = ( $opt_in_meta === '' ) ? true : (bool) $opt_in_meta;
+        $opt_in      = ( '' === $opt_in_meta ) ? true : ( '1' === $opt_in_meta );
 
         $first = $order->get_billing_first_name();
         $last  = $order->get_billing_last_name();
