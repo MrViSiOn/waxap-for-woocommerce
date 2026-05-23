@@ -16,13 +16,20 @@ final class Settings {
 
     /** @var array<string,string> Valores por defecto. */
     private const DEFAULTS = [
-        'wrapper_url'     => 'http://host.docker.internal:3000',
-        'api_key'         => '',
-        'tenant_id'       => '',
-        'session_id'      => '',
-        'hmac_secret'     => '',
-        'phone_number'    => '',
-        'notify_statuses' => 'processing,completed',
+        'wrapper_url'          => 'http://host.docker.internal:3000',
+        'api_key'              => '',
+        'tenant_id'            => '',
+        'session_id'           => '',
+        'hmac_secret'          => '',
+        'phone_number'         => '',
+        'notify_statuses'      => 'processing,completed',
+        'template_processing'  => '¡Hola {nombre}! Hemos recibido tu pedido #{pedido} y lo estamos preparando. 🛒',
+        'template_completed'   => '¡Hola {nombre}! Tu pedido #{pedido} ha sido completado. ✅ ¡Gracias por tu compra!',
+        'template_on-hold'     => '¡Hola {nombre}! Tu pedido #{pedido} está pendiente de confirmación de pago. ⏳',
+        'template_cancelled'   => '¡Hola {nombre}! Tu pedido #{pedido} ha sido cancelado. Si tienes dudas, contáctanos. ❌',
+        'template_refunded'    => '¡Hola {nombre}! Hemos procesado el reembolso de tu pedido #{pedido}. 💰',
+        'template_pending'     => '¡Hola {nombre}! Tu pedido #{pedido} está pendiente de pago. Complétalo para que podamos procesarlo. ⏳',
+        'template_failed'      => '¡Hola {nombre}! El pago de tu pedido #{pedido} no se completó. Por favor, inténtalo de nuevo. ❌',
     ];
 
     public static function get( string $key ): string {

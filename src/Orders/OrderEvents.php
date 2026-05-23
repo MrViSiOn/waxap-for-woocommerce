@@ -58,6 +58,11 @@ final class OrderEvents {
             'whatsappOptIn' => $opt_in,
         ];
 
+        $message = $this->resolve_template( $order, $to_status );
+        if ( $message ) {
+            $payload['message'] = $message;
+        }
+
         // Incluir ventana 24h solo si el cliente escribió antes
         $last_inbound = $order->get_meta( '_wa_notifier_last_inbound_at', true );
         if ( $last_inbound ) {
@@ -65,5 +70,27 @@ final class OrderEvents {
         }
 
         ( new WrapperClient() )->send_event( $payload );
+    }
+
+    private function resolve_template( WC_Order $order, string $status ): string {
+        $template = Settings::get( 'template_' . $status );
+        if ( '' === $template ) {
+            return '';
+        }
+
+        $statuses     = wc_get_order_statuses();
+        $status_label = $statuses[ 'wc-' . $status ] ?? $status;
+
+        return str_replace(
+            [ '{nombre}', '{pedido}', '{estado}', '{total}', '{enlace}' ],
+            [
+                trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ) ?: 'Cliente',
+                (string) $order->get_id(),
+                $status_label,
+                html_entity_decode( strip_tags( wc_price( $order->get_total() ) ) ),
+                $order->get_view_order_url(),
+            ],
+            $template
+        );
     }
 }

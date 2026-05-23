@@ -74,6 +74,10 @@ final class AdminMenu {
             $enabled_statuses = array_filter(
                 explode( ',', Settings::get( 'notify_statuses' ) )
             );
+            $templates = [];
+            foreach ( [ 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed' ] as $s ) {
+                $templates[ $s ] = Settings::get( 'template_' . $s );
+            }
             include __DIR__ . '/views/tab-notifications.php';
             return;
         }
@@ -101,6 +105,16 @@ final class AdminMenu {
         ) );
 
         Settings::set( 'notify_statuses', implode( ',', $selected ) );
+
+        // Save message templates
+        $valid_statuses    = [ 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed' ];
+        $posted_templates  = isset( $_POST['wan_templates'] ) && is_array( $_POST['wan_templates'] )
+            ? $_POST['wan_templates']
+            : [];
+        foreach ( $valid_statuses as $s ) {
+            $tpl = sanitize_textarea_field( (string) ( $posted_templates[ $s ] ?? '' ) );
+            Settings::set( 'template_' . $s, $tpl );
+        }
 
         wp_safe_redirect( add_query_arg( [
             'page'    => self::SLUG,

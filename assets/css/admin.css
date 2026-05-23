@@ -434,6 +434,113 @@
     visibility: visible;
 }
 
+/* ── Template editor ─────────────────────────────────────── */
+
+.wan-template-section-header {
+    margin: 32px 0 20px;
+    padding-top: 28px;
+    border-top: 1px solid var(--wax-border);
+}
+
+.wan-template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 620px;
+    margin-bottom: 28px;
+}
+
+.wan-template-item {
+    border: 1px solid var(--wax-border);
+    border-radius: var(--wax-radius);
+    overflow: hidden;
+    background: var(--wax-white);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.wan-template-item:focus-within {
+    border-color: var(--wax-green-border);
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.10);
+}
+
+.wan-template-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--wax-bg);
+    border-bottom: 1px solid var(--wax-border);
+}
+
+.wan-template-header strong {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--wax-text);
+}
+
+.wan-template-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.wan-template-textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 14px 16px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--wax-text);
+    resize: vertical;
+    min-height: 76px;
+    font-family: inherit;
+    background: var(--wax-white);
+}
+
+.wan-template-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--wax-bg);
+    border-top: 1px solid var(--wax-border);
+    flex-wrap: wrap;
+}
+
+.wan-var-chip {
+    display: inline-flex;
+    align-items: center;
+    background: var(--wax-white);
+    border: 1px solid var(--wax-border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.6875rem;
+    font-family: monospace;
+    color: var(--wax-green-dark);
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    user-select: none;
+    line-height: 1.6;
+}
+
+.wan-var-chip:hover {
+    background: var(--wax-green-light);
+    border-color: var(--wax-green-border);
+}
+
+.wan-char-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--wax-text-muted);
+    flex-shrink: 0;
+}
+
 /* ── Test message section ────────────────────────────────── */
 
 #wa-notifier-test-wrap {

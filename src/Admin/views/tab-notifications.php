@@ -1,11 +1,12 @@
 <?php
 /**
- * Vista: tab Notificaciones — selector de estados de pedido.
+ * Vista: tab Notificaciones — selector de estados y plantillas de mensaje.
  *
  * @package WaNotifier
  * @license GPL-2.0-or-later
  *
  * @var string[] $enabled_statuses  Estados activos (inyectados por AdminMenu::render_tab).
+ * @var string[] $templates         Plantillas por estado (inyectados por AdminMenu::render_tab).
  */
 
 declare(strict_types=1);
@@ -91,9 +92,65 @@ if ( isset( $_GET['updated'] ) ) : ?>
         <?php endforeach; ?>
     </div>
 
+    <div class="wan-template-section-header waxap-section-header">
+        <h2><?php esc_html_e( 'Mensajes personalizados', 'wa-notifier' ); ?></h2>
+        <p><?php esc_html_e( 'Texto que recibirá el cliente en cada estado. Haz clic en una variable para insertarla en el cursor.', 'wa-notifier' ); ?></p>
+    </div>
+
+    <div class="wan-template-list">
+        <?php foreach ( $statuses as $key => $status ) :
+            $textarea_id = 'wan-tpl-' . esc_attr( $key );
+        ?>
+        <div class="wan-template-item">
+            <div class="wan-template-header">
+                <span class="wan-template-dot" style="background-color: <?php echo esc_attr( $status['color'] ); ?>"></span>
+                <strong><?php echo esc_html( $status['label'] ); ?></strong>
+            </div>
+            <textarea
+                name="wan_templates[<?php echo esc_attr( $key ); ?>]"
+                id="<?php echo $textarea_id; ?>"
+                class="wan-template-textarea"
+                rows="3"
+            ><?php echo esc_textarea( $templates[ $key ] ?? '' ); ?></textarea>
+            <div class="wan-template-footer">
+                <?php foreach ( [ '{nombre}', '{pedido}', '{estado}', '{total}', '{enlace}' ] as $var ) : ?>
+                <span class="wan-var-chip" data-target="<?php echo $textarea_id; ?>"><?php echo esc_html( $var ); ?></span>
+                <?php endforeach; ?>
+                <span class="wan-char-count" id="wan-count-<?php echo esc_attr( $key ); ?>">0</span>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+
     <p class="submit" style="padding:0;margin:0;">
         <button type="submit" class="button button-primary waxap-btn-primary">
             <?php esc_html_e( 'Guardar cambios', 'wa-notifier' ); ?>
         </button>
     </p>
 </form>
+
+<script>
+(function () {
+    document.querySelectorAll('.wan-template-textarea').forEach(function (ta) {
+        var key     = ta.id.replace('wan-tpl-', '');
+        var counter = document.getElementById('wan-count-' + key);
+        if (!counter) return;
+        function update() { counter.textContent = ta.value.length; }
+        update();
+        ta.addEventListener('input', update);
+    });
+
+    document.querySelectorAll('.wan-var-chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            var ta = document.getElementById(chip.dataset.target);
+            if (!ta) return;
+            var start = ta.selectionStart;
+            var end   = ta.selectionEnd;
+            ta.value  = ta.value.slice(0, start) + chip.textContent + ta.value.slice(end);
+            ta.selectionStart = ta.selectionEnd = start + chip.textContent.length;
+            ta.focus();
+            ta.dispatchEvent(new Event('input'));
+        });
+    });
+}());
+</script>
