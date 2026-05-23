@@ -151,12 +151,18 @@
                 initializing:  '⏳ Iniciando…',
                 qr_ready:      '📱 Esperando escaneo del QR…',
                 authenticating:'🔐 Autenticando…',
-                ready:         '✅ Conectado' + (phone ? ' como ' + phone : ''),
+                ready:         '✅ Conectado',
                 disconnected:  '❌ Desconectado',
                 failed:        '❌ Error en la sesión',
             };
             var label = labels[status] || '⏳ ' + status;
             $('#wa-notifier-status-text').text(label);
+
+            if (phone && status === 'ready') {
+                var formatted = phone.startsWith('+') ? phone : '+' + phone;
+                $('#wan-phone-display-number').text(formatted);
+                $('#wan-phone-display').show();
+            }
             $('#wa-notifier-status-dot')
                 .removeClass('wan-green wan-red wan-yellow')
                 .addClass(status === 'ready' ? 'wan-green' : (status === 'disconnected' || status === 'failed') ? 'wan-red' : 'wan-yellow');
