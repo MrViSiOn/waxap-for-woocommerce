@@ -126,9 +126,88 @@
 .wan-status-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-width: 620px;
+    gap: 8px;
+    max-width: 660px;
     margin-bottom: 28px;
+}
+
+/* ── Status item (card row + collapsible panel) ──────────── */
+
+.wan-status-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.wan-status-card-row {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.wan-status-card-row .wan-status-card {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Pencil / edit button ────────────────────────────────── */
+
+.wan-edit-tpl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    flex-shrink: 0;
+    background: var(--wax-white);
+    border: 1px solid var(--wax-border);
+    border-radius: var(--wax-radius);
+    cursor: pointer;
+    color: var(--wax-text-muted);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    padding: 0;
+}
+
+.wan-edit-tpl-btn:hover {
+    background: var(--wax-bg);
+    border-color: #c3c4c7;
+    color: var(--wax-text);
+}
+
+.wan-edit-tpl-btn.is-active {
+    background: var(--wax-green-light);
+    border-color: var(--wax-green-border);
+    color: var(--wax-green-dark);
+}
+
+/* ── Collapsible template panel ──────────────────────────── */
+
+.wan-tpl-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.22s ease;
+}
+
+.wan-tpl-panel.is-open {
+    max-height: 360px;
+}
+
+.wan-tpl-panel-inner {
+    border: 1px solid var(--wax-green-border);
+    border-top: none;
+    border-radius: 0 0 var(--wax-radius) var(--wax-radius);
+    background: var(--wax-green-light);
+    overflow: hidden;
+    /* leave space so the panel doesn't visually overlap the card border */
+    margin-right: 44px; /* align with card, not with the pencil button */
+}
+
+.wan-template-textarea--inline {
+    background: var(--wax-white) !important;
+    border-bottom: 1px solid var(--wax-green-border) !important;
+}
+
+.wan-tpl-panel-inner .wan-template-footer {
+    background: var(--wax-green-light);
+    border-top: none;
 }
 
 .wan-status-card {
