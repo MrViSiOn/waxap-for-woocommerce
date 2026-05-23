@@ -54,6 +54,9 @@ services:
       - .:/var/www/html/wp-content/plugins/wa-notifier:rw
       # MU plugin para forzar SMTP a MailHog
       - ./.docker/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
+    extra_hosts:
+      # Fuerza resolución de waxap.shop al IP de reader2 (por si el DNS local tarda en propagar)
+      - "waxap.shop:195.110.58.170"
     depends_on:
       mysql:
         condition: service_healthy
