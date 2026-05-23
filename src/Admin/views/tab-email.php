@@ -16,6 +16,21 @@ if ( isset( $_GET['updated'] ) ) : ?>
     <div class="waxap-updated"><?php esc_html_e( 'Configuración guardada.', 'wa-notifier' ); ?></div>
 <?php endif; ?>
 
+<?php if ( ! $has_phone ) : ?>
+    <div class="waxap-notice-warning">
+        <?php
+        printf(
+            /* translators: %s: link to phone tab */
+            wp_kses(
+                __( 'El botón no aparecerá en los emails hasta que vincules tu número WhatsApp en el tab <a href="%s">Número WhatsApp</a>.', 'wa-notifier' ),
+                [ 'a' => [ 'href' => [] ] ]
+            ),
+            esc_url( admin_url( 'admin.php?page=wa-notifier&tab=phone' ) )
+        );
+        ?>
+    </div>
+<?php endif; ?>
+
 <div class="waxap-section-header">
     <h2><?php esc_html_e( 'Botón WhatsApp en emails', 'wa-notifier' ); ?></h2>
     <p><?php esc_html_e( 'Añade un botón wa.me en los emails transaccionales de WooCommerce para que el cliente pueda escribirte directamente.', 'wa-notifier' ); ?></p>

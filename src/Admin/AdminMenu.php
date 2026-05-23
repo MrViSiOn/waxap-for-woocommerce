@@ -98,6 +98,7 @@ final class AdminMenu {
             $email_enabled  = '1' === Settings::get( 'email_button_enabled' );
             $email_text     = Settings::get( 'email_button_text' );
             $email_prefill  = Settings::get( 'email_button_prefill' );
+            $has_phone      = '' !== Settings::get( 'phone_number' );
             include __DIR__ . '/views/tab-email.php';
             return;
         }
