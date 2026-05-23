@@ -92,12 +92,24 @@ final class SessionPage {
     }
 
     private function render_session_status(): void {
+        $stored_phone   = Settings::get( 'phone_number' );
+        $display_phone  = $stored_phone ? '+' . ltrim( $stored_phone, '+' ) : '';
         ?>
         <div class="waxap-section-header">
             <h2><?php esc_html_e( 'Número WhatsApp', 'wa-notifier' ); ?></h2>
         </div>
 
-        <div id="wa-notifier-status-wrap" class="wan-session-status-card">
+        <?php if ( $display_phone ) : ?>
+        <div class="wan-phone-display">
+            <span class="wan-phone-display-icon">📱</span>
+            <div class="wan-phone-display-info">
+                <span class="wan-phone-display-label"><?php esc_html_e( 'Número vinculado', 'wa-notifier' ); ?></span>
+                <strong class="wan-phone-display-number"><?php echo esc_html( $display_phone ); ?></strong>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <div id="wa-notifier-status-wrap" class="wan-session-status-card" style="margin-top:12px;">
             <span class="wa-notifier-status-dot wa-notifier-status-dot"></span>
             <span id="wa-notifier-status-text"><?php esc_html_e( 'Comprobando…', 'wa-notifier' ); ?></span>
         </div>

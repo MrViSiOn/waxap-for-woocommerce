@@ -497,6 +497,45 @@
     padding: 0 !important;
 }
 
+/* ── Phone display ───────────────────────────────────────── */
+
+.wan-phone-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--wax-green-light);
+    border: 1px solid var(--wax-green-border);
+    border-radius: var(--wax-radius);
+    max-width: 480px;
+}
+
+.wan-phone-display-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.wan-phone-display-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.wan-phone-display-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--wax-text-muted);
+}
+
+.wan-phone-display-number {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--wax-green-dark);
+    letter-spacing: 0.5px;
+}
+
 /* ── Session status card ─────────────────────────────────── */
 
 .wan-session-status-card {
