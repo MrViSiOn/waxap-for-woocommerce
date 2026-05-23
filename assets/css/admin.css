@@ -434,6 +434,199 @@
     visibility: visible;
 }
 
+/* ── Form fields ─────────────────────────────────────────── */
+
+.wan-field-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.wan-field-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.wan-field-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--wax-text);
+}
+
+.wan-field-hint {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--wax-text-muted);
+}
+
+.wan-field-input.regular-text {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    border-color: var(--wax-border) !important;
+    border-radius: var(--wax-radius-sm) !important;
+    font-size: 0.875rem !important;
+    padding: 8px 12px !important;
+    height: auto !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+
+.wan-field-input.regular-text:focus {
+    border-color: var(--wax-green-border) !important;
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.10) !important;
+    outline: none !important;
+}
+
+/* ── Connection badge ────────────────────────────────────── */
+
+.wan-connection-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+.wan-connection-badge--ok {
+    background: var(--wax-green-light);
+    color: var(--wax-green-dark);
+    border: 1px solid var(--wax-green-border);
+}
+
+.wan-connection-badge--ok::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--wax-green);
+}
+
+.wan-connection-badge--off {
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.wan-connection-badge--off::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d1d5db;
+}
+
+/* ── Danger zone ─────────────────────────────────────────── */
+
+.wan-danger-zone {
+    margin-top: 36px;
+    padding: 20px 24px;
+    border: 1px solid #fecaca;
+    border-radius: var(--wax-radius);
+    background: #fff5f5;
+    max-width: 620px;
+}
+
+.wan-danger-zone h3 {
+    margin: 0 0 6px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #b91c1c;
+}
+
+.wan-danger-zone p {
+    margin: 0 0 14px;
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.wan-btn-danger {
+    background: #ef4444 !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+    border-radius: var(--wax-radius-sm) !important;
+    font-weight: 600 !important;
+    transition: background 0.15s !important;
+}
+
+.wan-btn-danger:hover {
+    background: #b91c1c !important;
+    border-color: #991b1b !important;
+}
+
+/* ── Warning notice ──────────────────────────────────────── */
+
+.waxap-notice-warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: var(--wax-radius-sm);
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    font-size: 0.875rem;
+    color: #92400e;
+    font-weight: 500;
+}
+
+/* ── Email preview ───────────────────────────────────────── */
+
+.wan-email-preview-wrap {
+    max-width: 620px;
+    margin: 24px 0 28px;
+}
+
+.wan-email-preview {
+    background: #f0f0f0;
+    border-radius: var(--wax-radius);
+    padding: 20px;
+}
+
+.wan-email-preview-body {
+    background: var(--wax-white);
+    border-radius: var(--wax-radius-sm);
+    padding: 24px 28px;
+    box-shadow: var(--wax-shadow);
+}
+
+.wan-email-preview-row {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.wan-email-preview-row--short  { width: 75%; }
+.wan-email-preview-row--shorter { width: 50%; margin-bottom: 0; }
+
+.wan-email-preview-btn-wrap {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.wan-email-preview-btn {
+    display: inline-block;
+    background: #25d366;
+    color: #ffffff !important;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-decoration: none !important;
+    pointer-events: none;
+}
+
 /* ── Template editor ─────────────────────────────────────── */
 
 .wan-template-section-header {

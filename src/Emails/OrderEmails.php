@@ -16,7 +16,6 @@ use WC_Order;
 final class OrderEmails {
 
     public function register(): void {
-        // Fires after the order table in customer-facing HTML emails
         add_action( 'woocommerce_email_after_order_table', [ $this, 'add_whatsapp_button' ], 10, 4 );
     }
 
@@ -27,8 +26,11 @@ final class OrderEmails {
      * @param \WC_Email $email
      */
     public function add_whatsapp_button( WC_Order $order, bool $sent_to_admin, bool $plain_text ): void {
-        // Only customer-facing HTML emails
         if ( $sent_to_admin || $plain_text ) {
+            return;
+        }
+
+        if ( '1' !== Settings::get( 'email_button_enabled' ) ) {
             return;
         }
 
@@ -40,13 +42,8 @@ final class OrderEmails {
         $clean_phone  = preg_replace( '/\D/', '', $phone );
         $order_number = $order->get_order_number();
 
-        /* translators: %s: order number */
-        $prefill = sprintf(
-            __( 'Hola, tengo una consulta sobre mi pedido #%s', 'wa-notifier' ),
-            $order_number
-        );
-
-        $url = 'https://wa.me/' . $clean_phone . '?text=' . rawurlencode( $prefill );
+        $prefill = str_replace( '{pedido}', $order_number, Settings::get( 'email_button_prefill' ) );
+        $url     = 'https://wa.me/' . $clean_phone . '?text=' . rawurlencode( $prefill );
 
         printf(
             '<p style="text-align:center;margin:24px 0 8px;">
@@ -57,7 +54,7 @@ final class OrderEmails {
                 </a>
             </p>',
             esc_url( $url ),
-            esc_html__( '¿Tienes dudas? Escríbenos por WhatsApp', 'wa-notifier' )
+            esc_html( Settings::get( 'email_button_text' ) )
         );
     }
 }

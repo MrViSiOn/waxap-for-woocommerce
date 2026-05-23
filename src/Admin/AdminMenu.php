@@ -35,6 +35,9 @@ final class AdminMenu {
         );
 
         add_action( 'admin_post_wa_notifier_save_notifications', [ $this, 'handle_save_notifications' ] );
+        add_action( 'admin_post_wa_notifier_save_email',         [ $this, 'handle_save_email' ] );
+        add_action( 'admin_post_wa_notifier_save_connection',    [ $this, 'handle_save_connection' ] );
+        add_action( 'admin_post_wa_notifier_disconnect',         [ $this, 'handle_disconnect' ] );
     }
 
     public function render(): void {
@@ -70,6 +73,15 @@ final class AdminMenu {
     }
 
     private function render_tab( string $tab ): void {
+        if ( $tab === 'connection' ) {
+            $is_connected = Settings::is_connected();
+            $wrapper_url  = Settings::get( 'wrapper_url' );
+            $api_key      = Settings::get( 'api_key' );
+            $tenant_id    = Settings::get( 'tenant_id' );
+            include __DIR__ . '/views/tab-connection.php';
+            return;
+        }
+
         if ( $tab === 'notifications' ) {
             $enabled_statuses = array_filter(
                 explode( ',', Settings::get( 'notify_statuses' ) )
@@ -79,6 +91,14 @@ final class AdminMenu {
                 $templates[ $s ] = Settings::get( 'template_' . $s );
             }
             include __DIR__ . '/views/tab-notifications.php';
+            return;
+        }
+
+        if ( $tab === 'email' ) {
+            $email_enabled  = '1' === Settings::get( 'email_button_enabled' );
+            $email_text     = Settings::get( 'email_button_text' );
+            $email_prefill  = Settings::get( 'email_button_prefill' );
+            include __DIR__ . '/views/tab-email.php';
             return;
         }
 
@@ -120,6 +140,69 @@ final class AdminMenu {
             'page'    => self::SLUG,
             'tab'     => 'notifications',
             'updated' => '1',
+        ], admin_url( 'admin.php' ) ) );
+        exit;
+    }
+
+    public function handle_save_email(): void {
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_die( 'No autorizado.' );
+        }
+
+        check_admin_referer( 'wa_notifier_save_email' );
+
+        Settings::set( 'email_button_enabled', isset( $_POST['email_button_enabled'] ) ? '1' : '0' );
+        Settings::set( 'email_button_text', sanitize_text_field( (string) ( $_POST['email_button_text'] ?? '' ) ) );
+        Settings::set( 'email_button_prefill', sanitize_textarea_field( (string) ( $_POST['email_button_prefill'] ?? '' ) ) );
+
+        wp_safe_redirect( add_query_arg( [
+            'page'    => self::SLUG,
+            'tab'     => 'email',
+            'updated' => '1',
+        ], admin_url( 'admin.php' ) ) );
+        exit;
+    }
+
+    public function handle_save_connection(): void {
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_die( 'No autorizado.' );
+        }
+
+        check_admin_referer( 'wa_notifier_save_connection' );
+
+        $wrapper_url = esc_url_raw( (string) ( $_POST['wrapper_url'] ?? '' ) );
+        $api_key     = sanitize_text_field( (string) ( $_POST['api_key'] ?? '' ) );
+        $tenant_id   = sanitize_text_field( (string) ( $_POST['tenant_id'] ?? '' ) );
+
+        if ( $wrapper_url ) {
+            Settings::set( 'wrapper_url', $wrapper_url );
+        }
+        Settings::set( 'api_key', $api_key );
+        Settings::set( 'tenant_id', $tenant_id );
+
+        wp_safe_redirect( add_query_arg( [
+            'page'    => self::SLUG,
+            'tab'     => 'connection',
+            'updated' => '1',
+        ], admin_url( 'admin.php' ) ) );
+        exit;
+    }
+
+    public function handle_disconnect(): void {
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_die( 'No autorizado.' );
+        }
+
+        check_admin_referer( 'wa_notifier_disconnect' );
+
+        foreach ( [ 'api_key', 'tenant_id', 'session_id', 'hmac_secret', 'phone_number' ] as $key ) {
+            Settings::set( $key, '' );
+        }
+
+        wp_safe_redirect( add_query_arg( [
+            'page'         => self::SLUG,
+            'tab'          => 'connection',
+            'disconnected' => '1',
         ], admin_url( 'admin.php' ) ) );
         exit;
     }
