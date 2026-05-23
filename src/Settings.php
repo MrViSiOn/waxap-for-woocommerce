@@ -16,12 +16,13 @@ final class Settings {
 
     /** @var array<string,string> Valores por defecto. */
     private const DEFAULTS = [
-        'wrapper_url'  => 'http://host.docker.internal:3000',
-        'api_key'      => '',
-        'tenant_id'    => '',
-        'session_id'   => '',
-        'hmac_secret'  => '',
-        'phone_number' => '',
+        'wrapper_url'     => 'http://host.docker.internal:3000',
+        'api_key'         => '',
+        'tenant_id'       => '',
+        'session_id'      => '',
+        'hmac_secret'     => '',
+        'phone_number'    => '',
+        'notify_statuses' => 'processing,completed',
     ];
 
     public static function get( string $key ): string {

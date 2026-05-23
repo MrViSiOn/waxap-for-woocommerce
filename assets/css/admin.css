@@ -1,0 +1,446 @@
+/* ============================================================
+   Waxap — Admin styles
+   ============================================================ */
+
+:root {
+    --wax-green:        #25d366;
+    --wax-green-dark:   #128c7e;
+    --wax-green-light:  #edfaf3;
+    --wax-green-border: #b5eace;
+    --wax-text:         #1d2327;
+    --wax-text-muted:   #6b7280;
+    --wax-border:       #e2e4e7;
+    --wax-bg:           #f6f7f7;
+    --wax-white:        #ffffff;
+    --wax-radius:       10px;
+    --wax-radius-sm:    6px;
+    --wax-shadow:       0 1px 4px rgba(0, 0, 0, 0.08);
+    --wax-shadow-md:    0 4px 16px rgba(0, 0, 0, 0.10);
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+
+.waxap-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 0 18px;
+    border-bottom: 1px solid var(--wax-border);
+    margin-bottom: 0;
+}
+
+.waxap-logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--wax-green);
+    border-radius: var(--wax-radius-sm);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--wax-white);
+    letter-spacing: -1px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.35);
+}
+
+.waxap-header-text h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--wax-text);
+    line-height: 1.2;
+}
+
+.waxap-header-text p {
+    margin: 2px 0 0;
+    color: var(--wax-text-muted);
+    font-size: 0.8125rem;
+}
+
+/* ── Tab navigation ──────────────────────────────────────── */
+
+.waxap-admin-wrap .nav-tab-wrapper {
+    margin-bottom: 0;
+    border-bottom-color: var(--wax-border);
+}
+
+.waxap-admin-wrap .nav-tab {
+    font-size: 0.8125rem;
+    padding: 8px 16px;
+    border-radius: var(--wax-radius-sm) var(--wax-radius-sm) 0 0;
+    color: var(--wax-text-muted);
+    border-color: transparent;
+    background: transparent;
+    margin-bottom: -1px;
+}
+
+.waxap-admin-wrap .nav-tab:hover {
+    color: var(--wax-text);
+    background: var(--wax-bg);
+    border-color: transparent;
+}
+
+.waxap-admin-wrap .nav-tab-active {
+    color: var(--wax-green-dark) !important;
+    border-color: var(--wax-border) var(--wax-border) var(--wax-white) !important;
+    background: var(--wax-white) !important;
+    font-weight: 600;
+}
+
+/* ── Tab content wrapper ─────────────────────────────────── */
+
+.waxap-tab-content {
+    background: var(--wax-white);
+    border: 1px solid var(--wax-border);
+    border-top: none;
+    border-radius: 0 0 var(--wax-radius) var(--wax-radius);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+
+.waxap-section-header {
+    margin-bottom: 24px;
+}
+
+.waxap-section-header h2 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--wax-text);
+}
+
+.waxap-section-header p {
+    margin: 0;
+    color: var(--wax-text-muted);
+    font-size: 0.875rem;
+    max-width: 560px;
+}
+
+/* ── Status cards ────────────────────────────────────────── */
+
+.wan-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 620px;
+    margin-bottom: 28px;
+}
+
+.wan-status-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--wax-white);
+    border: 1px solid var(--wax-border);
+    border-radius: var(--wax-radius);
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    user-select: none;
+}
+
+.wan-status-card:hover {
+    border-color: #c3c4c7;
+    box-shadow: var(--wax-shadow);
+}
+
+.wan-status-card:has(.wan-toggle-input:checked) {
+    border-color: var(--wax-green-border);
+    background: var(--wax-green-light);
+}
+
+.wan-status-dot-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.wan-status-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.wan-status-info strong {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--wax-text);
+    margin-bottom: 2px;
+}
+
+.wan-status-info span {
+    font-size: 0.8125rem;
+    color: var(--wax-text-muted);
+    line-height: 1.4;
+}
+
+/* ── Toggle switch ───────────────────────────────────────── */
+
+.wan-toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.wan-toggle-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+}
+
+.wan-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+    pointer-events: none;
+}
+
+.wan-toggle-thumb {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: var(--wax-white);
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+}
+
+.wan-toggle-input:checked ~ .wan-toggle-track {
+    background: var(--wax-green);
+}
+
+.wan-toggle-input:checked ~ .wan-toggle-thumb {
+    transform: translateX(20px);
+}
+
+.wan-toggle-input:focus-visible ~ .wan-toggle-track {
+    outline: 2px solid var(--wax-green);
+    outline-offset: 2px;
+}
+
+/* ── Primary button ──────────────────────────────────────── */
+
+.waxap-btn-primary.button-primary {
+    background: var(--wax-green) !important;
+    border-color: var(--wax-green-dark) !important;
+    color: var(--wax-white) !important;
+    padding: 7px 20px !important;
+    height: auto !important;
+    font-size: 0.875rem !important;
+    border-radius: var(--wax-radius-sm) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(37, 211, 102, 0.3) !important;
+    transition: background 0.15s, box-shadow 0.15s !important;
+}
+
+.waxap-btn-primary.button-primary:hover,
+.waxap-btn-primary.button-primary:focus {
+    background: var(--wax-green-dark) !important;
+    border-color: var(--wax-green-dark) !important;
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.4) !important;
+}
+
+/* ── Success / updated notice ────────────────────────────── */
+
+.waxap-updated {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--wax-green-light);
+    border: 1px solid var(--wax-green-border);
+    border-radius: var(--wax-radius-sm);
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    font-size: 0.875rem;
+    color: var(--wax-green-dark);
+    font-weight: 500;
+}
+
+.waxap-updated::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: var(--wax-green);
+    border-radius: 50%;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M13.5 3.5L6 11 2.5 7.5l-1 1L6 13l8.5-8.5z'/%3E%3C/svg%3E");
+    background-size: 10px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* ── Coming soon placeholder ─────────────────────────────── */
+
+.waxap-coming-soon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--wax-text-muted);
+}
+
+.waxap-coming-soon .waxap-cs-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--wax-green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.waxap-coming-soon .waxap-cs-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--wax-green-dark);
+}
+
+.waxap-coming-soon h3 {
+    margin: 0 0 8px;
+    font-size: 0.9375rem;
+    color: var(--wax-text);
+}
+
+.waxap-coming-soon p {
+    margin: 0;
+    font-size: 0.875rem;
+    max-width: 320px;
+}
+
+/* ── QR Modal ────────────────────────────────────────────── */
+
+#wa-notifier-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+}
+
+#wa-notifier-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+}
+
+.wa-notifier-modal-box {
+    position: relative;
+    background: var(--wax-white);
+    border-radius: 14px;
+    padding: 2rem;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    box-shadow: var(--wax-shadow-md);
+}
+
+.wa-notifier-modal-box h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: var(--wax-text);
+}
+
+#wa-notifier-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: var(--wax-bg);
+    border: 1px solid var(--wax-border);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--wax-text-muted);
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+#wa-notifier-modal-close:hover {
+    background: var(--wax-border);
+    color: var(--wax-text);
+}
+
+#wa-notifier-qr-wrap {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 1rem 0;
+}
+
+#wa-notifier-qr-img {
+    max-width: 220px;
+    height: auto;
+    display: none;
+    border: 1px solid var(--wax-border);
+    border-radius: var(--wax-radius-sm);
+    padding: 8px;
+}
+
+#wa-notifier-qr-loading {
+    color: var(--wax-text-muted);
+    font-size: 0.875rem;
+}
+
+/* ── Status dot (session page) ───────────────────────────── */
+
+.wa-notifier-status-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #d1d5db;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.wa-notifier-status-dot.wan-green  { background: var(--wax-green); }
+.wa-notifier-status-dot.wan-red    { background: #ef4444; }
+.wa-notifier-status-dot.wan-yellow { background: #f59e0b; }
+
+/* ── Spinner ─────────────────────────────────────────────── */
+
+.wa-notifier-spinner {
+    visibility: hidden;
+}
+
+.wa-notifier-spinner.is-active {
+    visibility: visible;
+}
+
+/* ── Test message section ────────────────────────────────── */
+
+#wa-notifier-test-wrap {
+    margin-top: 1.5rem;
+}
+
+#wa-notifier-test-result {
+    margin-top: 0.5rem;
+    max-width: 560px;
+}

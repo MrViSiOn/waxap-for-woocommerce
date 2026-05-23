@@ -42,7 +42,7 @@ final class Plugin {
 
         wp_enqueue_style(
             'wa-notifier-admin',
-            WA_NOTIFIER_URL . 'assets/css/admin-session.css',
+            WA_NOTIFIER_URL . 'assets/css/admin.css',
             [],
             $ver,
         );

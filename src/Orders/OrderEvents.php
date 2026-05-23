@@ -31,6 +31,11 @@ final class OrderEvents {
             return;
         }
 
+        $enabled = array_filter( explode( ',', Settings::get( 'notify_statuses' ) ) );
+        if ( ! empty( $enabled ) && ! in_array( $to_status, $enabled, true ) ) {
+            return;
+        }
+
         $phone = preg_replace( '/\D/', '', $order->get_billing_phone() );
         if ( ! $phone ) {
             return;
