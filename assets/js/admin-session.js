@@ -158,10 +158,14 @@
             var label = labels[status] || '⏳ ' + status;
             $('#wa-notifier-status-text').text(label);
 
-            if (phone && status === 'ready') {
+            if (status === 'ready' && phone) {
                 var formatted = phone.startsWith('+') ? phone : '+' + phone;
                 $('#wan-phone-display-number').text(formatted);
                 $('#wan-phone-display').show();
+                $('#wa-notifier-status-wrap').css('margin-top', '12px');
+            } else {
+                $('#wan-phone-display').hide();
+                $('#wa-notifier-status-wrap').css('margin-top', '0');
             }
             $('#wa-notifier-status-dot')
                 .removeClass('wan-green wan-red wan-yellow')
@@ -170,6 +174,10 @@
             // Show "re-link" button if disconnected
             if (status === 'disconnected' || status === 'failed') {
                 $('#wa-notifier-link-btn').show();
+                $('#wa-notifier-unlink-btn').hide();
+            } else if (status === 'ready') {
+                $('#wa-notifier-link-btn').hide();
+                $('#wa-notifier-unlink-btn').show();
             }
 
             // Show/hide test form based on status

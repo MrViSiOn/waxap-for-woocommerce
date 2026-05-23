@@ -107,7 +107,7 @@ final class SessionPage {
             </div>
         </div>
 
-        <div id="wa-notifier-status-wrap" class="wan-session-status-card" style="margin-top:12px;">
+        <div id="wa-notifier-status-wrap" class="wan-session-status-card">
             <span class="wa-notifier-status-dot wa-notifier-status-dot"></span>
             <span id="wa-notifier-status-text"><?php esc_html_e( 'Comprobando…', 'wa-notifier' ); ?></span>
         </div>
