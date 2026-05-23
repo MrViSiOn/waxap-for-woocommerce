@@ -121,6 +121,14 @@
                 if (!res.success) return;
                 var data = res.data;
 
+                // QR escaneado: ocultar imagen y mostrar loader de autenticación
+                if (data.status === 'authenticating' || (data.status !== 'qr_ready' && !data.qr && $('#wa-notifier-qr-img').attr('src'))) {
+                    if (data.status === 'authenticating') {
+                        $('#wa-notifier-qr-img').hide();
+                        $('#wa-notifier-qr-loading').html('⏳ Verificando… un momento').show();
+                    }
+                }
+
                 // Update QR image if available
                 if (data.qr) {
                     $('#wa-notifier-qr-img').attr('src', data.qr).show();
@@ -252,7 +260,7 @@
 
         openModal: function () {
             $('#wa-notifier-qr-img').attr('src', '').hide();
-            $('#wa-notifier-qr-loading').show();
+            $('#wa-notifier-qr-loading').html('Generando QR…').show();
             this.clearError('#wa-notifier-modal-error');
             $('#wa-notifier-modal').attr('aria-hidden', 'false').show();
             $('body').css('overflow', 'hidden');
