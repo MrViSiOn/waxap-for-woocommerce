@@ -29,7 +29,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
         <p><?php esc_html_e( 'Tu tienda está conectada al servidor. Puedes actualizar los datos de acceso si es necesario.', 'wa-notifier' ); ?></p>
     </div>
 
-    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" autocomplete="off">
         <input type="hidden" name="action" value="wa_notifier_save_connection">
         <?php wp_nonce_field( 'wa_notifier_save_connection' ); ?>
 
@@ -40,7 +40,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
                 </label>
                 <input type="url" id="wan-wrapper-url" name="wrapper_url"
                        value="<?php echo esc_attr( $wrapper_url ); ?>"
-                       class="regular-text wan-field-input" required>
+                       class="regular-text wan-field-input" autocomplete="off" required>
             </div>
 
             <div class="wan-field-row">
@@ -56,7 +56,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
             <div class="wan-field-row">
                 <label class="wan-field-label"><?php esc_html_e( 'Tenant ID', 'wa-notifier' ); ?></label>
                 <input type="text" value="<?php echo esc_attr( $tenant_id ); ?>"
-                       class="regular-text wan-field-input" readonly>
+                       class="regular-text wan-field-input" autocomplete="off" readonly>
                 <input type="hidden" name="tenant_id" value="<?php echo esc_attr( $tenant_id ); ?>">
             </div>
             <?php endif; ?>
@@ -92,7 +92,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
         <p><?php esc_html_e( 'Introduce la URL del servidor y tu API Key para conectar la tienda.', 'wa-notifier' ); ?></p>
     </div>
 
-    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" autocomplete="off">
         <input type="hidden" name="action" value="wa_notifier_save_connection">
         <?php wp_nonce_field( 'wa_notifier_save_connection' ); ?>
 
@@ -104,7 +104,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
                 </label>
                 <input type="url" id="wan-wrapper-url" name="wrapper_url"
                        value="<?php echo esc_attr( $wrapper_url ); ?>"
-                       class="regular-text wan-field-input" required>
+                       class="regular-text wan-field-input" autocomplete="off" required>
             </div>
 
             <div class="wan-field-row">
@@ -123,7 +123,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
                     <span class="wan-field-hint"><?php esc_html_e( 'Identificador de tu cuenta en el servidor.', 'wa-notifier' ); ?></span>
                 </label>
                 <input type="text" id="wan-tenant-id" name="tenant_id"
-                       value="" class="regular-text wan-field-input">
+                       value="" class="regular-text wan-field-input" autocomplete="off">
             </div>
         </div>
 

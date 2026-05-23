@@ -21,7 +21,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
     <p><?php esc_html_e( 'Añade un botón wa.me en los emails transaccionales de WooCommerce para que el cliente pueda escribirte directamente.', 'wa-notifier' ); ?></p>
 </div>
 
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" autocomplete="off">
     <input type="hidden" name="action" value="wa_notifier_save_email">
     <?php wp_nonce_field( 'wa_notifier_save_email' ); ?>
 
@@ -57,6 +57,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
                 name="email_button_text"
                 value="<?php echo esc_attr( $email_text ); ?>"
                 class="regular-text wan-field-input"
+                autocomplete="off"
                 maxlength="100"
             >
         </div>
