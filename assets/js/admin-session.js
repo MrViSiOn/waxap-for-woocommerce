@@ -14,14 +14,13 @@
             $(document).on('click', '#wa-notifier-modal-content', function (e) { e.stopPropagation(); });
             $(document).on('submit', '#wa-notifier-test-form', this.onTestSubmit.bind(this));
 
-            // Escape key closes modal
             $(document).on('keyup', function (e) {
                 if (e.key === 'Escape') WAN.onModalClose();
             });
 
-            // If we already have a session, poll immediately to refresh status
+            // Si ya hay sesión, refrescamos el estado en pantalla sin recargar la página.
             if (waNotifierData.hasSession === '1') {
-                this.pollOnce();
+                this.refreshStatus();
             }
         },
 
@@ -81,7 +80,21 @@
 
         /* ---- Session polling ---- */
 
+        // Sólo actualiza el dot/texto — nunca recarga la página.
+        // Se usa en carga inicial cuando ya existe sesión.
+        refreshStatus: function () {
+            $.post(waNotifierData.ajaxUrl, {
+                action: 'wa_notifier_poll_session',
+                nonce:  waNotifierData.nonce,
+            })
+            .done(function (res) {
+                if (!res.success) return;
+                WAN.updateStatusDisplay(res.data.status, res.data.phone);
+            });
+        },
+
         startPolling: function () {
+            this.isLinking = true;
             this.stopPolling();
             this.pollOnce();
             this.pollTimer = setInterval(function () { WAN.pollOnce(); }, WAN.POLL_INTERVAL_MS);
@@ -127,7 +140,6 @@
 
         onAuthenticated: function (phone) {
             this.closeModal();
-            // Reload to show new status
             location.reload();
         },
 

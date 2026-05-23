@@ -38,18 +38,20 @@ final class Plugin {
             return;
         }
 
+        $ver = defined( 'WP_DEBUG' ) && WP_DEBUG ? (string) time() : WA_NOTIFIER_VERSION;
+
         wp_enqueue_style(
             'wa-notifier-admin',
             WA_NOTIFIER_URL . 'assets/css/admin-session.css',
             [],
-            WA_NOTIFIER_VERSION,
+            $ver,
         );
 
         wp_enqueue_script(
             'wa-notifier-admin',
             WA_NOTIFIER_URL . 'assets/js/admin-session.js',
             [ 'jquery' ],
-            WA_NOTIFIER_VERSION,
+            $ver,
             true,
         );
 
