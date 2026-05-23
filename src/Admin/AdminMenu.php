@@ -33,7 +33,9 @@ final class AdminMenu {
             self::SLUG,
             [ $this, 'render' ],
         );
+    }
 
+    public function register_form_handlers(): void {
         add_action( 'admin_post_wa_notifier_save_notifications', [ $this, 'handle_save_notifications' ] );
         add_action( 'admin_post_wa_notifier_save_email',         [ $this, 'handle_save_email' ] );
         add_action( 'admin_post_wa_notifier_save_connection',    [ $this, 'handle_save_connection' ] );

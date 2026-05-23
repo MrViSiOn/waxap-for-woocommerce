@@ -21,7 +21,9 @@ final class Plugin {
 
     public function boot(): void {
         if ( is_admin() ) {
-            add_action( 'admin_menu', [ new AdminMenu(), 'register' ] );
+            $admin_menu = new AdminMenu();
+            add_action( 'admin_menu', [ $admin_menu, 'register' ] );
+            add_action( 'admin_init', [ $admin_menu, 'register_form_handlers' ] );
             add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
         }
 
