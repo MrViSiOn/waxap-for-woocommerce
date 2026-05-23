@@ -80,8 +80,8 @@
 
         /* ---- Session polling ---- */
 
-        // Sólo actualiza el dot/texto — nunca recarga la página.
-        // Se usa en carga inicial cuando ya existe sesión.
+        // Actualiza estado en carga inicial. Si la sesión ya está esperando QR,
+        // abre el modal y arranca el polling para que el usuario pueda escanear.
         refreshStatus: function () {
             $.post(waNotifierData.ajaxUrl, {
                 action: 'wa_notifier_poll_session',
@@ -89,7 +89,12 @@
             })
             .done(function (res) {
                 if (!res.success) return;
-                WAN.updateStatusDisplay(res.data.status, res.data.phone);
+                var data = res.data;
+                WAN.updateStatusDisplay(data.status, data.phone);
+                if (data.status === 'qr_ready' || data.status === 'initializing' || data.status === 'authenticating') {
+                    WAN.openModal();
+                    WAN.startPolling();
+                }
             });
         },
 
