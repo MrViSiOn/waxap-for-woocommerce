@@ -90,6 +90,7 @@ final class AdminMenu {
             foreach ( [ 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed' ] as $s ) {
                 $templates[ $s ] = Settings::get( 'template_' . $s );
             }
+            $country_code = Settings::get( 'phone_country_code' ) ?: '34';
             include __DIR__ . '/views/tab-notifications.php';
             return;
         }
@@ -126,6 +127,9 @@ final class AdminMenu {
         ) );
 
         Settings::set( 'notify_statuses', implode( ',', $selected ) );
+
+        $country_code = preg_replace( '/\D/', '', (string) ( $_POST['phone_country_code'] ?? '34' ) );
+        Settings::set( 'phone_country_code', $country_code ?: '34' );
 
         // Save message templates
         $valid_statuses    = [ 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed' ];

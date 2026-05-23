@@ -36,7 +36,7 @@ final class OrderEvents {
             return;
         }
 
-        $phone = preg_replace( '/\D/', '', $order->get_billing_phone() );
+        $phone = self::normalize_phone( $order->get_billing_phone() );
         if ( ! $phone ) {
             return;
         }
@@ -70,6 +70,19 @@ final class OrderEvents {
         }
 
         ( new WrapperClient() )->send_event( $payload );
+    }
+
+    private static function normalize_phone( string $raw ): string {
+        $digits = preg_replace( '/\D/', '', $raw );
+        if ( ! $digits ) {
+            return '';
+        }
+        $digits       = ltrim( $digits, '0' );
+        $country_code = Settings::get( 'phone_country_code' ) ?: '34';
+        if ( ! str_starts_with( $digits, $country_code ) ) {
+            $digits = $country_code . $digits;
+        }
+        return $digits;
     }
 
     private function resolve_template( WC_Order $order, string $status ): string {

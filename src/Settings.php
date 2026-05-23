@@ -22,6 +22,7 @@ final class Settings {
         'session_id'           => '',
         'hmac_secret'          => '',
         'phone_number'         => '',
+        'phone_country_code'   => '34',
         'notify_statuses'      => 'processing,completed',
         'email_button_enabled' => '1',
         'email_button_text'    => '¿Tienes dudas? Escríbenos por WhatsApp',

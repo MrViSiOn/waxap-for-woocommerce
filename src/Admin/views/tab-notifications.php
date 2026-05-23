@@ -62,6 +62,18 @@ if ( isset( $_GET['updated'] ) ) : ?>
     <input type="hidden" name="action" value="wa_notifier_save_notifications">
     <?php wp_nonce_field( 'wa_notifier_save_notifications' ); ?>
 
+    <div class="wan-field-rows" style="max-width:480px;margin-bottom:28px;">
+        <div class="wan-field-row">
+            <label for="wan-country-code" class="wan-field-label">
+                <?php esc_html_e( 'Prefijo de país (teléfonos de clientes)', 'wa-notifier' ); ?>
+                <span class="wan-field-hint"><?php esc_html_e( 'Sin el +. Se añade si el número del cliente no lo lleva. España: 34', 'wa-notifier' ); ?></span>
+            </label>
+            <input type="text" id="wan-country-code" name="phone_country_code"
+                   value="<?php echo esc_attr( $country_code ); ?>"
+                   class="small-text wan-field-input" maxlength="5" pattern="[0-9]{1,5}" placeholder="34">
+        </div>
+    </div>
+
     <div class="wan-status-list">
         <?php foreach ( $statuses as $key => $status ) :
             $is_enabled  = in_array( $key, $enabled_statuses, true );
