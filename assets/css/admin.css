@@ -408,6 +408,78 @@
     font-size: 0.875rem;
 }
 
+/* ── Action row (button + spinner) ──────────────────────── */
+
+.wan-action-row {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ── Session status card ─────────────────────────────────── */
+
+.wan-session-status-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--wax-bg);
+    border: 1px solid var(--wax-border);
+    border-radius: var(--wax-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--wax-text);
+    max-width: 480px;
+}
+
+/* ── Inline notices ──────────────────────────────────────── */
+
+.wan-inline-notice {
+    display: block;
+    padding: 10px 14px;
+    border-radius: var(--wax-radius-sm);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    max-width: 480px;
+    margin: 0;
+}
+
+.wan-inline-notice--error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+/* notice-success / notice-error from JS inside tab content */
+.waxap-tab-content #wa-notifier-test-result.notice-success {
+    background: var(--wax-green-light);
+    border: 1px solid var(--wax-green-border);
+    color: var(--wax-green-dark);
+}
+
+.waxap-tab-content #wa-notifier-test-result.notice-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+/* ── Outline danger button ───────────────────────────────── */
+
+.wan-btn-outline-danger {
+    background: transparent !important;
+    border-color: #fca5a5 !important;
+    color: #dc2626 !important;
+    border-radius: var(--wax-radius-sm) !important;
+    transition: background 0.15s, border-color 0.15s !important;
+}
+
+.wan-btn-outline-danger:hover {
+    background: #fef2f2 !important;
+    border-color: #ef4444 !important;
+}
+
 /* ── Status dot (session page) ───────────────────────────── */
 
 .wa-notifier-status-dot {

@@ -29,49 +29,46 @@ final class SessionPage {
     private function render_register_form(): void {
         $wrapper_url = Settings::get( 'wrapper_url' );
         ?>
-        <h2><?php esc_html_e( 'Conecta tu tienda con WA Notifier', 'wa-notifier' ); ?></h2>
-        <p><?php esc_html_e( 'Introduce la URL del servidor y crea tu cuenta para empezar.', 'wa-notifier' ); ?></p>
+        <div class="waxap-section-header">
+            <h2><?php esc_html_e( 'Conecta tu número WhatsApp', 'wa-notifier' ); ?></h2>
+            <p><?php esc_html_e( 'Introduce tus credenciales de servidor para empezar a enviar notificaciones.', 'wa-notifier' ); ?></p>
+        </div>
 
-        <form id="wa-notifier-register-form" method="post">
+        <form id="wa-notifier-register-form" method="post" autocomplete="off">
             <?php wp_nonce_field( 'wa_notifier_register', 'wa_notifier_nonce' ); ?>
 
-            <table class="form-table" role="presentation">
-                <tr>
-                    <th scope="row">
-                        <label for="wan-wrapper-url"><?php esc_html_e( 'URL del servidor', 'wa-notifier' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="url" id="wan-wrapper-url" name="wrapper_url"
-                               value="<?php echo esc_attr( $wrapper_url ); ?>"
-                               class="regular-text" required />
-                        <p class="description"><?php esc_html_e( 'Ejemplo: http://localhost:3000 o https://api.tudominio.com', 'wa-notifier' ); ?></p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="wan-email"><?php esc_html_e( 'Email', 'wa-notifier' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="email" id="wan-email" name="email" class="regular-text" required />
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="wan-password"><?php esc_html_e( 'Contraseña', 'wa-notifier' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="password" id="wan-password" name="password" class="regular-text" required minlength="8" />
-                    </td>
-                </tr>
-            </table>
+            <div class="wan-field-rows" style="max-width:480px;">
+                <div class="wan-field-row">
+                    <label for="wan-wrapper-url" class="wan-field-label">
+                        <?php esc_html_e( 'URL del servidor', 'wa-notifier' ); ?>
+                    </label>
+                    <input type="url" id="wan-wrapper-url" name="wrapper_url"
+                           value="<?php echo esc_attr( $wrapper_url ); ?>"
+                           class="regular-text wan-field-input" autocomplete="off" required>
+                </div>
+                <div class="wan-field-row">
+                    <label for="wan-email" class="wan-field-label">
+                        <?php esc_html_e( 'Email', 'wa-notifier' ); ?>
+                    </label>
+                    <input type="email" id="wan-email" name="email"
+                           class="regular-text wan-field-input" required>
+                </div>
+                <div class="wan-field-row">
+                    <label for="wan-password" class="wan-field-label">
+                        <?php esc_html_e( 'Contraseña', 'wa-notifier' ); ?>
+                    </label>
+                    <input type="password" id="wan-password" name="password"
+                           class="regular-text wan-field-input" required minlength="8">
+                </div>
+            </div>
 
-            <p id="wa-notifier-register-error" class="notice notice-error" style="display:none;padding:8px 12px;"></p>
+            <p id="wa-notifier-register-error" class="wan-inline-notice wan-inline-notice--error" style="display:none;"></p>
 
-            <p class="submit">
-                <button type="submit" class="button button-primary" id="wa-notifier-register-btn">
+            <p class="wan-action-row">
+                <button type="submit" class="button button-primary waxap-btn-primary" id="wa-notifier-register-btn">
                     <?php esc_html_e( 'Crear cuenta y conectar', 'wa-notifier' ); ?>
                 </button>
-                <span class="wa-notifier-spinner spinner" style="float:none;margin:4px 8px;"></span>
+                <span class="wa-notifier-spinner spinner" style="float:none;margin:0;"></span>
             </p>
         </form>
         <?php
@@ -79,62 +76,72 @@ final class SessionPage {
 
     private function render_link_button(): void {
         ?>
-        <h2><?php esc_html_e( 'Vincular número WhatsApp', 'wa-notifier' ); ?></h2>
-        <p><?php esc_html_e( 'Tu tienda está conectada al servidor. Ahora vincula tu número WhatsApp escaneando un QR.', 'wa-notifier' ); ?></p>
-        <p>
-            <button type="button" class="button button-primary" id="wa-notifier-link-btn">
-                📱 <?php esc_html_e( 'Vincular WhatsApp', 'wa-notifier' ); ?>
+        <div class="waxap-section-header">
+            <h2><?php esc_html_e( 'Vincula tu número WhatsApp', 'wa-notifier' ); ?></h2>
+            <p><?php esc_html_e( 'Tu tienda está conectada al servidor. Escanea el código QR con WhatsApp para vincular tu número.', 'wa-notifier' ); ?></p>
+        </div>
+
+        <p class="wan-action-row">
+            <button type="button" class="button button-primary waxap-btn-primary" id="wa-notifier-link-btn">
+                <?php esc_html_e( 'Vincular WhatsApp', 'wa-notifier' ); ?>
             </button>
-            <span class="wa-notifier-spinner spinner" style="float:none;margin:4px 8px;"></span>
+            <span class="wa-notifier-spinner spinner" style="float:none;margin:0;"></span>
         </p>
-        <p id="wa-notifier-link-error" class="notice notice-error" style="display:none;padding:8px 12px;"></p>
+        <p id="wa-notifier-link-error" class="wan-inline-notice wan-inline-notice--error" style="display:none;margin-top:8px;"></p>
         <?php
     }
 
     private function render_session_status(): void {
         ?>
-        <h2><?php esc_html_e( 'Estado de la sesión WhatsApp', 'wa-notifier' ); ?></h2>
-        <div id="wa-notifier-status-wrap">
-            <p>
-                <span class="wa-notifier-status-dot"></span>
-                <span id="wa-notifier-status-text"><?php esc_html_e( 'Comprobando…', 'wa-notifier' ); ?></span>
-            </p>
+        <div class="waxap-section-header">
+            <h2><?php esc_html_e( 'Número WhatsApp', 'wa-notifier' ); ?></h2>
         </div>
-        <p>
-            <button type="button" class="button button-primary" id="wa-notifier-link-btn" style="display:none;">
-                📱 <?php esc_html_e( 'Volver a vincular', 'wa-notifier' ); ?>
+
+        <div id="wa-notifier-status-wrap" class="wan-session-status-card">
+            <span class="wa-notifier-status-dot wa-notifier-status-dot"></span>
+            <span id="wa-notifier-status-text"><?php esc_html_e( 'Comprobando…', 'wa-notifier' ); ?></span>
+        </div>
+
+        <p class="wan-action-row" style="margin-top:20px;">
+            <button type="button" class="button button-primary waxap-btn-primary" id="wa-notifier-link-btn" style="display:none;">
+                <?php esc_html_e( 'Volver a vincular', 'wa-notifier' ); ?>
             </button>
-            <button type="button" class="button" id="wa-notifier-unlink-btn">
-                <?php esc_html_e( 'Desvincular', 'wa-notifier' ); ?>
+            <span class="wa-notifier-spinner spinner" style="float:none;margin:0;"></span>
+        </p>
+        <p style="margin-top:8px;">
+            <button type="button" class="button wan-btn-outline-danger" id="wa-notifier-unlink-btn">
+                <?php esc_html_e( 'Desvincular número', 'wa-notifier' ); ?>
             </button>
         </p>
-        <p id="wa-notifier-link-error" class="notice notice-error" style="display:none;padding:8px 12px;"></p>
+        <p id="wa-notifier-link-error" class="wan-inline-notice wan-inline-notice--error" style="display:none;margin-top:8px;"></p>
 
         <div id="wa-notifier-test-wrap" style="display:none;">
-            <hr />
-            <h3><?php esc_html_e( 'Enviar mensaje de prueba', 'wa-notifier' ); ?></h3>
-            <p class="description"><?php esc_html_e( 'Verifica que la conexión funciona enviando un mensaje a cualquier número WhatsApp.', 'wa-notifier' ); ?></p>
-            <form id="wa-notifier-test-form">
-                <table class="form-table" role="presentation">
-                    <tr>
-                        <th scope="row">
-                            <label for="wan-test-phone"><?php esc_html_e( 'Número de teléfono', 'wa-notifier' ); ?></label>
-                        </th>
-                        <td>
-                            <input type="tel" id="wan-test-phone" name="to"
-                                   placeholder="+34612345678" class="regular-text" required />
-                            <p class="description"><?php esc_html_e( 'Formato internacional: +34612345678', 'wa-notifier' ); ?></p>
-                        </td>
-                    </tr>
-                </table>
-                <p class="submit">
-                    <button type="submit" class="button button-secondary" id="wa-notifier-test-btn">
-                        💬 <?php esc_html_e( 'Enviar mensaje de prueba', 'wa-notifier' ); ?>
+            <div class="wan-template-section-header waxap-section-header">
+                <h2><?php esc_html_e( 'Mensaje de prueba', 'wa-notifier' ); ?></h2>
+                <p><?php esc_html_e( 'Verifica que la conexión funciona enviando un mensaje a cualquier número WhatsApp.', 'wa-notifier' ); ?></p>
+            </div>
+
+            <form id="wa-notifier-test-form" autocomplete="off">
+                <div class="wan-field-rows" style="max-width:480px;">
+                    <div class="wan-field-row">
+                        <label for="wan-test-phone" class="wan-field-label">
+                            <?php esc_html_e( 'Número de teléfono', 'wa-notifier' ); ?>
+                            <span class="wan-field-hint"><?php esc_html_e( 'Formato internacional: +34612345678', 'wa-notifier' ); ?></span>
+                        </label>
+                        <input type="tel" id="wan-test-phone" name="to"
+                               placeholder="+34612345678"
+                               class="regular-text wan-field-input" autocomplete="off" required>
+                    </div>
+                </div>
+
+                <p class="wan-action-row">
+                    <button type="submit" class="button button-primary waxap-btn-primary" id="wa-notifier-test-btn">
+                        <?php esc_html_e( 'Enviar mensaje de prueba', 'wa-notifier' ); ?>
                     </button>
-                    <span class="wa-notifier-spinner spinner" style="float:none;margin:4px 8px;"></span>
+                    <span class="wa-notifier-spinner spinner" style="float:none;margin:0;"></span>
                 </p>
             </form>
-            <p id="wa-notifier-test-result" class="notice" style="display:none;padding:8px 12px;"></p>
+            <p id="wa-notifier-test-result" class="wan-inline-notice" style="display:none;margin-top:8px;"></p>
         </div>
         <?php
     }
@@ -154,7 +161,7 @@ final class SessionPage {
                     <p class="description">
                         <?php esc_html_e( 'WhatsApp → Dispositivos vinculados → Vincular un dispositivo', 'wa-notifier' ); ?>
                     </p>
-                    <p id="wa-notifier-modal-error" class="notice notice-error" style="display:none;padding:8px 12px;"></p>
+                    <p id="wa-notifier-modal-error" class="wan-inline-notice wan-inline-notice--error" style="display:none;"></p>
                 </div>
             </div>
         </div>
