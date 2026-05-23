@@ -112,7 +112,7 @@ final class SessionPage {
             <span id="wa-notifier-status-text"><?php esc_html_e( 'Comprobando…', 'wa-notifier' ); ?></span>
         </div>
 
-        <p class="wan-action-row" style="margin-top:32px;">
+        <p class="wan-action-row">
             <button type="button" class="button button-primary waxap-btn-primary" id="wa-notifier-link-btn" style="display:none;">
                 <?php esc_html_e( 'Volver a vincular', 'wa-notifier' ); ?>
             </button>
