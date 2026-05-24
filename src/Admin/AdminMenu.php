@@ -42,7 +42,8 @@ final class AdminMenu {
         add_action( 'admin_post_wa_notifier_save_email',         [ $this, 'handle_save_email' ] );
         add_action( 'admin_post_wa_notifier_save_connection',    [ $this, 'handle_save_connection' ] );
         add_action( 'admin_post_wa_notifier_disconnect',         [ $this, 'handle_disconnect' ] );
-        add_action( 'admin_post_wa_notifier_login',              [ $this, 'handle_login' ] );
+        add_action( 'admin_post_wa_notifier_login',               [ $this, 'handle_login' ] );
+        add_action( 'admin_post_wa_notifier_cancel_registration', [ $this, 'handle_cancel_registration' ] );
     }
 
     public function render(): void {
@@ -276,6 +277,23 @@ final class AdminMenu {
             'page'    => self::SLUG,
             'tab'     => 'phone',
             'updated' => '1',
+        ], admin_url( 'admin.php' ) ) );
+        exit;
+    }
+
+    public function handle_cancel_registration(): void {
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_die( 'No autorizado.' );
+        }
+
+        check_admin_referer( 'wa_notifier_cancel_registration' );
+
+        Settings::set( 'tenant_id', '' );
+
+        wp_safe_redirect( add_query_arg( [
+            'page'       => self::SLUG,
+            'tab'        => 'connection',
+            'show_login' => '1',
         ], admin_url( 'admin.php' ) ) );
         exit;
     }

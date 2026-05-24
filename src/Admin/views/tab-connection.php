@@ -134,7 +134,7 @@ else :
         <!-- Toggle: ya tengo cuenta -->
         <?php
         $login_error = isset( $_GET['login_error'] ) ? sanitize_text_field( (string) $_GET['login_error'] ) : '';
-        $show_login  = $login_error !== '';
+        $show_login  = $login_error !== '' || ! empty( $_GET['show_login'] );
         ?>
         <p style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;">
             <a href="#" id="wan-toggle-login" style="font-size:13px;color:#666;text-decoration:none;">
@@ -231,6 +231,16 @@ else :
                 <a href="#" id="wan-ob-already-paid"><?php esc_html_e( 'Verificar ahora', 'wa-notifier' ); ?></a>
             </p>
         </div>
+
+        <p style="margin-top:24px;border-top:1px solid #e5e7eb;padding-top:16px;">
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline;">
+                <input type="hidden" name="action" value="wa_notifier_cancel_registration">
+                <?php wp_nonce_field( 'wa_notifier_cancel_registration' ); ?>
+                <button type="submit" class="button-link" style="font-size:13px;color:#666;cursor:pointer;">
+                    <?php esc_html_e( '← Conectar con otra cuenta', 'wa-notifier' ); ?>
+                </button>
+            </form>
+        </p>
     </div>
 
     <!-- PASO 3: ¡Activado! -->
