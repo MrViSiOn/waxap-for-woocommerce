@@ -104,6 +104,18 @@ final class WrapperClient {
     }
 
     /**
+     * Devuelve el historial de mensajes WhatsApp enviados por este tenant.
+     *
+     * @return array{data: array<int,array<string,mixed>>, total: int, limit: int, offset: int}|WP_Error
+     */
+    public function get_message_log( int $limit = 20, int $offset = 0 ): array|WP_Error {
+        return $this->request( 'GET', '/v1/messages', query: [
+            'limit'  => (string) $limit,
+            'offset' => (string) $offset,
+        ], auth: true );
+    }
+
+    /**
      * Envía un evento de cambio de estado de pedido al wrapper, firmado con HMAC.
      *
      * @param array<string,mixed> $payload

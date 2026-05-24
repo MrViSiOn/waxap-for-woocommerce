@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace WaNotifier\Admin;
 
+use WaNotifier\Api\WrapperClient;
 use WaNotifier\Settings;
 
 final class AdminMenu {
@@ -22,6 +23,7 @@ final class AdminMenu {
         'phone'         => 'Número WhatsApp',
         'notifications' => 'Notificaciones',
         'email'         => 'Email branding',
+        'history'       => 'Historial',
     ];
 
     public function register(): void {
@@ -120,6 +122,20 @@ final class AdminMenu {
             $email_prefill  = Settings::get( 'email_button_prefill' );
             $has_phone      = '' !== Settings::get( 'phone_number' );
             include __DIR__ . '/views/tab-email.php';
+            return;
+        }
+
+        if ( $tab === 'history' ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $page   = max( 1, (int) ( $_GET['paged'] ?? 1 ) );
+            $limit  = 20;
+            $offset = ( $page - 1 ) * $limit;
+
+            $client  = new WrapperClient();
+            $result  = $client->get_message_log( $limit, $offset );
+            $log     = is_wp_error( $result ) ? null : $result;
+            $error   = is_wp_error( $result ) ? $result->get_error_message() : null;
+            include __DIR__ . '/views/tab-history.php';
             return;
         }
 
