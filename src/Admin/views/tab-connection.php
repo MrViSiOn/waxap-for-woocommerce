@@ -97,6 +97,10 @@ else :
     </div>
 
     <!-- PASO 1: Crear cuenta -->
+    <?php
+    $login_error = isset( $_GET['login_error'] ) ? sanitize_text_field( (string) $_GET['login_error'] ) : '';
+    $show_login  = $login_error !== '' || ! empty( $_GET['show_login'] );
+    ?>
     <div id="wan-ob-step-1" class="wan-ob-step" <?php echo $ob_step !== '1' ? 'style="display:none"' : ''; ?>>
         <div class="waxap-section-header">
             <h2><?php esc_html_e( 'Crea tu cuenta Waxap', 'wa-notifier' ); ?></h2>
@@ -132,10 +136,6 @@ else :
         </form>
 
         <!-- Toggle: ya tengo cuenta -->
-        <?php
-        $login_error = isset( $_GET['login_error'] ) ? sanitize_text_field( (string) $_GET['login_error'] ) : '';
-        $show_login  = $login_error !== '' || ! empty( $_GET['show_login'] );
-        ?>
         <p style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;" <?php echo $show_login ? 'hidden' : ''; ?>>
             <a href="#" id="wan-toggle-login" style="font-size:13px;color:#666;text-decoration:none;">
                 <?php esc_html_e( '¿Ya tienes cuenta? Inicia sesión →', 'wa-notifier' ); ?>
