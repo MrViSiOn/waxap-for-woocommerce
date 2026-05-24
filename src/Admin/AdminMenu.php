@@ -60,7 +60,11 @@ final class AdminMenu {
             </header>
 
             <nav class="nav-tab-wrapper woo-nav-tab-wrapper">
-                <?php foreach ( self::TABS as $slug => $label ) : ?>
+                <?php
+                $is_connected = Settings::is_connected();
+                $visible_tabs = $is_connected ? self::TABS : [ 'connection' => self::TABS['connection'] ];
+                foreach ( $visible_tabs as $slug => $label ) :
+                ?>
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=' . self::SLUG . '&tab=' . $slug ) ); ?>"
                        class="nav-tab <?php echo $current === $slug ? 'nav-tab-active' : ''; ?>">
                         <?php echo esc_html( __( $label, 'wa-notifier' ) ); ?>
@@ -77,6 +81,11 @@ final class AdminMenu {
     }
 
     private function render_tab( string $tab ): void {
+        if ( $tab !== 'connection' && ! Settings::is_connected() ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=' . self::SLUG . '&tab=connection' ) );
+            exit;
+        }
+
         if ( $tab === 'connection' ) {
             $is_connected = Settings::is_connected();
             $wrapper_url  = Settings::get( 'wrapper_url' );
