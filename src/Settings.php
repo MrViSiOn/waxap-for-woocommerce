@@ -53,6 +53,12 @@ final class Settings {
         return '' !== self::get( 'api_key' );
     }
 
+    public static function disconnect(): void {
+        foreach ( [ 'api_key', 'tenant_id', 'session_id', 'hmac_secret', 'phone_number' ] as $key ) {
+            self::set( $key, '' );
+        }
+    }
+
     public static function has_session(): bool {
         return '' !== self::get( 'session_id' );
     }

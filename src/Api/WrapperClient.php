@@ -215,6 +215,13 @@ final class WrapperClient {
 
         if ( $code >= 400 ) {
             $message = is_array( $data ) ? ( $data['message'] ?? 'Error desconocido' ) : 'Error desconocido';
+
+            // Si la API rechaza las credenciales en una request autenticada, el tenant
+            // fue cancelado/desactivado desde el servidor. Limpiamos las credenciales locales.
+            if ( $auth && $code === 401 && Settings::is_connected() ) {
+                Settings::disconnect();
+            }
+
             return new WP_Error( 'wrapper_error', $message, [ 'status' => $code ] );
         }
 
