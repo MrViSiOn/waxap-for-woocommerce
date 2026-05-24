@@ -64,6 +64,117 @@ if ( $is_connected ) : ?>
         </button>
     </form>
 
+    <?php if ( $usage !== null ) :
+        $used        = (int) ( $usage['used'] ?? 0 );
+        $quota       = (int) ( $usage['quota'] ?? 100 );
+        $status      = (string) ( $usage['status'] ?? 'active' );
+        $reset_at    = ! empty( $usage['quotaResetAt'] ) ? new DateTime( $usage['quotaResetAt'] ) : null;
+        $pct         = $quota > 0 ? min( 100, (int) round( $used / $quota * 100 ) ) : 0;
+        $remaining   = $quota - $used;
+        $warning     = $remaining < 20;
+        $portal_url  = admin_url( 'admin.php?page=wa-notifier&tab=connection' );
+    ?>
+    <div class="wan-usage-card" style="margin-top:24px;padding:16px 20px;border:1px solid #e5e7eb;border-radius:8px;max-width:620px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <strong style="font-size:14px;"><?php esc_html_e( 'Plan Waxap', 'wa-notifier' ); ?></strong>
+            <?php if ( $status === 'active' ) : ?>
+                <span style="background:#d1fae5;color:#065f46;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;"><?php esc_html_e( 'Activo', 'wa-notifier' ); ?></span>
+            <?php elseif ( $status === 'suspended' ) : ?>
+                <span style="background:#fee2e2;color:#991b1b;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;"><?php esc_html_e( 'Suspendido', 'wa-notifier' ); ?></span>
+            <?php else : ?>
+                <span style="background:#e5e7eb;color:#374151;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;"><?php echo esc_html( $status ); ?></span>
+            <?php endif; ?>
+        </div>
+
+        <div style="margin-bottom:6px;font-size:13px;color:#555;">
+            <?php
+            printf(
+                /* translators: %1$d: mensajes usados, %2$d: quota total */
+                esc_html__( '%1$d / %2$d mensajes usados este mes', 'wa-notifier' ),
+                $used,
+                $quota
+            );
+            ?>
+        </div>
+        <div style="background:#e5e7eb;border-radius:4px;height:8px;overflow:hidden;">
+            <div style="background:<?php echo $warning ? '#ef4444' : '#25d366'; ?>;height:100%;width:<?php echo esc_attr( $pct ); ?>%;transition:width .3s;"></div>
+        </div>
+
+        <?php if ( $reset_at ) : ?>
+        <p style="font-size:12px;color:#9ca3af;margin:6px 0 0;">
+            <?php
+            printf(
+                /* translators: %s: fecha de renovación */
+                esc_html__( 'Renovación el %s', 'wa-notifier' ),
+                esc_html( wp_date( get_option( 'date_format' ), $reset_at->getTimestamp() + 30 * DAY_IN_SECONDS ) )
+            );
+            ?>
+        </p>
+        <?php endif; ?>
+
+        <?php if ( $warning && $status === 'active' ) : ?>
+        <p style="margin:10px 0 0;padding:8px 12px;background:#fef3c7;border-radius:6px;font-size:13px;color:#92400e;">
+            ⚠️ <?php
+            printf(
+                /* translators: %d: mensajes restantes */
+                esc_html__( 'Te quedan %d mensajes este mes. Considera actualizar tu plan.', 'wa-notifier' ),
+                $remaining
+            );
+            ?>
+        </p>
+        <?php endif; ?>
+
+        <?php if ( in_array( $status, [ 'suspended', 'cancelled' ], true ) ) : ?>
+        <p style="margin:10px 0 0;padding:8px 12px;background:#fee2e2;border-radius:6px;font-size:13px;color:#991b1b;">
+            🔴 <?php esc_html_e( 'Tu suscripción no está activa. La tienda no enviará notificaciones.', 'wa-notifier' ); ?>
+        </p>
+        <?php endif; ?>
+
+        <p style="margin:12px 0 0;">
+            <a href="#" id="wan-portal-btn" style="font-size:13px;">
+                <?php esc_html_e( 'Gestionar suscripción →', 'wa-notifier' ); ?>
+            </a>
+            <span id="wan-portal-spinner" style="display:none;font-size:12px;color:#9ca3af;margin-left:8px;"><?php esc_html_e( 'Cargando…', 'wa-notifier' ); ?></span>
+        </p>
+    </div>
+
+    <script>
+    (function () {
+        var btn = document.getElementById('wan-portal-btn');
+        var spinner = document.getElementById('wan-portal-spinner');
+        if (!btn) return;
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            btn.style.pointerEvents = 'none';
+            spinner.style.display = 'inline';
+            fetch(ajaxurl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'wa_notifier_billing_portal',
+                    nonce: '<?php echo esc_js( wp_create_nonce( 'wa_notifier_billing_portal' ) ); ?>',
+                })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success && data.data && data.data.url) {
+                    window.open(data.data.url, '_blank');
+                } else {
+                    alert(data.data || '<?php echo esc_js( __( 'Error al obtener el enlace.', 'wa-notifier' ) ); ?>');
+                }
+            })
+            .catch(function () {
+                alert('<?php echo esc_js( __( 'Error de conexión.', 'wa-notifier' ) ); ?>');
+            })
+            .finally(function () {
+                btn.style.pointerEvents = '';
+                spinner.style.display = 'none';
+            });
+        });
+    })();
+    </script>
+    <?php endif; ?>
+
     <div class="wan-danger-zone">
         <h3><?php esc_html_e( 'Desconectar', 'wa-notifier' ); ?></h3>
         <p><?php esc_html_e( 'Elimina las credenciales y desvincula la sesión WhatsApp. La tienda dejará de enviar notificaciones.', 'wa-notifier' ); ?></p>

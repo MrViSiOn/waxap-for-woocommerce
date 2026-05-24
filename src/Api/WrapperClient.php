@@ -104,6 +104,25 @@ final class WrapperClient {
     }
 
     /**
+     * Devuelve el uso mensual y estado de suscripción del tenant.
+     *
+     * @return array{status:string,used:int,quota:int,quotaResetAt:string|null}|WP_Error
+     */
+    public function get_usage(): array|WP_Error {
+        return $this->request( 'GET', '/v1/billing/usage', auth: true );
+    }
+
+    /**
+     * Obtiene la URL del portal de cliente Stripe para gestionar la suscripción.
+     *
+     * @return array{url:string}|WP_Error
+     */
+    public function get_billing_portal_url( string $return_url = '' ): array|WP_Error {
+        $body = $return_url ? [ 'returnUrl' => $return_url ] : [];
+        return $this->request( 'POST', '/v1/billing/portal', $body, auth: true );
+    }
+
+    /**
      * Inicia sesión con email y contraseña y devuelve las credenciales del tenant.
      *
      * @return array{tenantId:string,apiKey:string,hmacSecret:string}|WP_Error

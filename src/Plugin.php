@@ -13,6 +13,7 @@ namespace WaNotifier;
 use WaNotifier\Admin\AdminMenu;
 use WaNotifier\Admin\Onboarding;
 use WaNotifier\Ajax\SessionAjax;
+use WaNotifier\Api\WrapperClient;
 use WaNotifier\Checkout\CheckoutOptIn;
 use WaNotifier\Emails\OrderEmails;
 use WaNotifier\Orders\OrderEvents;
@@ -31,6 +32,19 @@ final class Plugin {
 
         $ajax = new SessionAjax();
         $ajax->register();
+
+        add_action( 'wp_ajax_wa_notifier_billing_portal', function () {
+            check_ajax_referer( 'wa_notifier_billing_portal', 'nonce' );
+            if ( ! current_user_can( 'manage_woocommerce' ) ) {
+                wp_send_json_error( 'No autorizado.', 403 );
+            }
+            $return_url = admin_url( 'admin.php?page=wa-notifier&tab=connection' );
+            $result     = ( new WrapperClient() )->get_billing_portal_url( $return_url );
+            if ( is_wp_error( $result ) ) {
+                wp_send_json_error( $result->get_error_message() );
+            }
+            wp_send_json_success( [ 'url' => $result['url'] ] );
+        } );
 
         $onboarding = new Onboarding();
         $onboarding->register();

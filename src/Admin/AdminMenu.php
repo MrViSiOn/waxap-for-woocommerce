@@ -93,6 +93,14 @@ final class AdminMenu {
             $wrapper_url  = Settings::get( 'wrapper_url' );
             $api_key      = Settings::get( 'api_key' );
             $tenant_id    = Settings::get( 'tenant_id' );
+            $usage        = null;
+            if ( $is_connected ) {
+                $client = new WrapperClient();
+                $result = $client->get_usage();
+                if ( ! is_wp_error( $result ) ) {
+                    $usage = $result;
+                }
+            }
             include __DIR__ . '/views/tab-connection.php';
             return;
         }
