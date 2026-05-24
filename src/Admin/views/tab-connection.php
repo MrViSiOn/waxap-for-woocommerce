@@ -136,7 +136,7 @@ else :
         </form>
 
         <!-- Toggle: ya tengo cuenta -->
-        <p style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;" <?php echo $show_login ? 'hidden' : ''; ?>>
+        <p id="wan-toggle-login-wrap" style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;<?php echo $show_login ? 'display:none;' : ''; ?>">
             <a href="#" id="wan-toggle-login" style="font-size:13px;color:#666;text-decoration:none;">
                 <?php esc_html_e( '¿Ya tienes cuenta? Inicia sesión →', 'wa-notifier' ); ?>
             </a>
@@ -182,23 +182,24 @@ else :
 
         <script>
         (function () {
-            var toggle  = document.getElementById('wan-toggle-login');
-            var cancel  = document.getElementById('wan-cancel-login');
-            var wrap    = document.getElementById('wan-login-form-wrap');
-            var regForm = document.getElementById('wan-ob-register-form');
+            var toggleWrap = document.getElementById('wan-toggle-login-wrap');
+            var toggle     = document.getElementById('wan-toggle-login');
+            var cancel     = document.getElementById('wan-cancel-login');
+            var wrap       = document.getElementById('wan-login-form-wrap');
+            var regForm    = document.getElementById('wan-ob-register-form');
             if (!toggle || !wrap) return;
             toggle.addEventListener('click', function (e) {
                 e.preventDefault();
                 wrap.style.display = 'block';
                 regForm.style.display = 'none';
-                toggle.style.display = 'none';
+                toggleWrap.style.display = 'none';
             });
             if (cancel) {
                 cancel.addEventListener('click', function (e) {
                     e.preventDefault();
                     wrap.style.display = 'none';
                     regForm.style.display = 'block';
-                    toggle.style.display = '';
+                    toggleWrap.style.display = '';
                 });
             }
         })();
