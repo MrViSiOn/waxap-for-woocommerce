@@ -5,49 +5,12 @@
  * @package WaNotifier
  * @license GPL-2.0-or-later
  *
- * @var string[] $enabled_statuses  Estados activos (inyectados por AdminMenu::render_tab).
- * @var string[] $templates         Plantillas por estado (inyectados por AdminMenu::render_tab).
+ * @var string[]              $enabled_statuses  Estados activos (inyectados por AdminMenu::render_tab).
+ * @var string[]              $templates         Plantillas por estado (inyectados por AdminMenu::render_tab).
+ * @var array<string,array{label:string,color:string,desc:string}> $statuses Lista dinámica de estados WC.
  */
 
 declare(strict_types=1);
-
-$statuses = [
-    'processing' => [
-        'label' => 'Procesando',
-        'desc'  => 'El cliente completó el pago. El pedido está en preparación.',
-        'color' => '#2271b1',
-    ],
-    'completed'  => [
-        'label' => 'Completado',
-        'desc'  => 'El pedido ha sido entregado o marcado como completado.',
-        'color' => '#25d366',
-    ],
-    'on-hold'    => [
-        'label' => 'En espera',
-        'desc'  => 'Pago pendiente de confirmación (ej. transferencia bancaria).',
-        'color' => '#f59e0b',
-    ],
-    'cancelled'  => [
-        'label' => 'Cancelado',
-        'desc'  => 'El pedido fue cancelado por el cliente o la tienda.',
-        'color' => '#ef4444',
-    ],
-    'refunded'   => [
-        'label' => 'Reembolsado',
-        'desc'  => 'El importe fue devuelto al cliente.',
-        'color' => '#8b5cf6',
-    ],
-    'pending'    => [
-        'label' => 'Pendiente de pago',
-        'desc'  => 'El pedido existe pero el cliente aún no ha pagado.',
-        'color' => '#9ca3af',
-    ],
-    'failed'     => [
-        'label' => 'Fallido',
-        'desc'  => 'El pago no pudo completarse.',
-        'color' => '#6b7280',
-    ],
-];
 
 if ( isset( $_GET['updated'] ) ) : ?>
     <div class="waxap-updated"><?php esc_html_e( 'Configuración guardada.', 'wa-notifier' ); ?></div>
@@ -90,7 +53,9 @@ if ( isset( $_GET['updated'] ) ) : ?>
 
                     <div class="wan-status-info">
                         <strong><?php echo esc_html( $status['label'] ); ?></strong>
+                        <?php if ( ! empty( $status['desc'] ) ) : ?>
                         <span><?php echo esc_html( $status['desc'] ); ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <div class="wan-toggle">

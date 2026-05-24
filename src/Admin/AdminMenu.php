@@ -88,9 +88,26 @@ final class AdminMenu {
             $enabled_statuses = array_filter(
                 explode( ',', Settings::get( 'notify_statuses' ) )
             );
+            $status_meta = [
+                'processing' => [ 'color' => '#2271b1', 'desc' => 'El cliente completó el pago. El pedido está en preparación.' ],
+                'completed'  => [ 'color' => '#25d366', 'desc' => 'El pedido ha sido entregado o marcado como completado.' ],
+                'on-hold'    => [ 'color' => '#f59e0b', 'desc' => 'Pago pendiente de confirmación (ej. transferencia bancaria).' ],
+                'cancelled'  => [ 'color' => '#ef4444', 'desc' => 'El pedido fue cancelado por el cliente o la tienda.' ],
+                'refunded'   => [ 'color' => '#8b5cf6', 'desc' => 'El importe fue devuelto al cliente.' ],
+                'pending'    => [ 'color' => '#9ca3af', 'desc' => 'El pedido existe pero el cliente aún no ha pagado.' ],
+                'failed'     => [ 'color' => '#6b7280', 'desc' => 'El pago no pudo completarse.' ],
+            ];
+            $statuses  = [];
             $templates = [];
-            foreach ( [ 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed' ] as $s ) {
-                $templates[ $s ] = Settings::get( 'template_' . $s );
+            foreach ( wc_get_order_statuses() as $wc_key => $label ) {
+                $key              = ltrim( $wc_key, 'wc-' );
+                $meta             = $status_meta[ $key ] ?? [];
+                $statuses[ $key ] = [
+                    'label' => $label,
+                    'color' => $meta['color'] ?? '#6b7280',
+                    'desc'  => $meta['desc'] ?? '',
+                ];
+                $templates[ $key ] = Settings::get( 'template_' . $key );
             }
             $country_code = Settings::get( 'phone_country_code' ) ?: '34';
             include __DIR__ . '/views/tab-notifications.php';
@@ -119,7 +136,7 @@ final class AdminMenu {
 
         check_admin_referer( 'wa_notifier_save_notifications' );
 
-        $valid    = [ 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed' ];
+        $valid    = array_map( fn( string $k ) => ltrim( $k, 'wc-' ), array_keys( wc_get_order_statuses() ) );
         $posted   = isset( $_POST['wan_notify_statuses'] ) && is_array( $_POST['wan_notify_statuses'] )
             ? $_POST['wan_notify_statuses']
             : [];
@@ -134,11 +151,10 @@ final class AdminMenu {
         Settings::set( 'phone_country_code', $country_code ?: '34' );
 
         // Save message templates
-        $valid_statuses    = [ 'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed' ];
-        $posted_templates  = isset( $_POST['wan_templates'] ) && is_array( $_POST['wan_templates'] )
+        $posted_templates = isset( $_POST['wan_templates'] ) && is_array( $_POST['wan_templates'] )
             ? $_POST['wan_templates']
             : [];
-        foreach ( $valid_statuses as $s ) {
+        foreach ( $valid as $s ) {
             $tpl = sanitize_textarea_field( (string) ( $posted_templates[ $s ] ?? '' ) );
             Settings::set( 'template_' . $s, $tpl );
         }
