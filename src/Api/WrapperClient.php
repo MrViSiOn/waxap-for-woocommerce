@@ -104,6 +104,18 @@ final class WrapperClient {
     }
 
     /**
+     * Inicia sesión con email y contraseña y devuelve las credenciales del tenant.
+     *
+     * @return array{tenantId:string,apiKey:string,hmacSecret:string}|WP_Error
+     */
+    public function login( string $email, string $password ): array|WP_Error {
+        return $this->request( 'POST', '/v1/auth/login', [
+            'email'    => $email,
+            'password' => $password,
+        ] );
+    }
+
+    /**
      * Devuelve el historial de mensajes WhatsApp enviados por este tenant.
      *
      * @return array{data: array<int,array<string,mixed>>, total: int, limit: int, offset: int}|WP_Error

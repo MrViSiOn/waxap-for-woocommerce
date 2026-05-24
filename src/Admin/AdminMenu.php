@@ -42,6 +42,7 @@ final class AdminMenu {
         add_action( 'admin_post_wa_notifier_save_email',         [ $this, 'handle_save_email' ] );
         add_action( 'admin_post_wa_notifier_save_connection',    [ $this, 'handle_save_connection' ] );
         add_action( 'admin_post_wa_notifier_disconnect',         [ $this, 'handle_disconnect' ] );
+        add_action( 'admin_post_wa_notifier_login',              [ $this, 'handle_login' ] );
     }
 
     public function render(): void {
@@ -231,6 +232,49 @@ final class AdminMenu {
         wp_safe_redirect( add_query_arg( [
             'page'    => self::SLUG,
             'tab'     => 'connection',
+            'updated' => '1',
+        ], admin_url( 'admin.php' ) ) );
+        exit;
+    }
+
+    public function handle_login(): void {
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_die( 'No autorizado.' );
+        }
+
+        check_admin_referer( 'wa_notifier_login' );
+
+        $email    = sanitize_email( (string) ( $_POST['email'] ?? '' ) );
+        $password = (string) ( $_POST['password'] ?? '' );
+
+        if ( ! $email || ! $password ) {
+            wp_safe_redirect( add_query_arg( [
+                'page'       => self::SLUG,
+                'tab'        => 'connection',
+                'login_error' => 'missing_fields',
+            ], admin_url( 'admin.php' ) ) );
+            exit;
+        }
+
+        $client = new WrapperClient();
+        $result = $client->login( $email, $password );
+
+        if ( is_wp_error( $result ) ) {
+            wp_safe_redirect( add_query_arg( [
+                'page'        => self::SLUG,
+                'tab'         => 'connection',
+                'login_error' => urlencode( $result->get_error_message() ),
+            ], admin_url( 'admin.php' ) ) );
+            exit;
+        }
+
+        Settings::set( 'api_key',     $result['apiKey'] );
+        Settings::set( 'tenant_id',   $result['tenantId'] );
+        Settings::set( 'hmac_secret', $result['hmacSecret'] );
+
+        wp_safe_redirect( add_query_arg( [
+            'page'    => self::SLUG,
+            'tab'     => 'phone',
             'updated' => '1',
         ], admin_url( 'admin.php' ) ) );
         exit;
