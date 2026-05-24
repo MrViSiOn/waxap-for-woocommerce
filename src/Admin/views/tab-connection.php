@@ -130,6 +130,70 @@ else :
                 <?php esc_html_e( 'Crear cuenta', 'wa-notifier' ); ?>
             </button>
         </form>
+
+        <!-- Toggle: ya tengo cuenta -->
+        <p style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;">
+            <a href="#" id="wan-toggle-apikey" style="font-size:13px;color:#666;text-decoration:none;">
+                <?php esc_html_e( '¿Ya tienes cuenta? Conéctate con tu API Key →', 'wa-notifier' ); ?>
+            </a>
+        </p>
+
+        <div id="wan-apikey-form-wrap" style="display:none;">
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" autocomplete="off">
+                <input type="hidden" name="action" value="wa_notifier_save_connection">
+                <input type="hidden" name="wrapper_url" value="<?php echo esc_attr( $wrapper_url ); ?>">
+                <?php wp_nonce_field( 'wa_notifier_save_connection' ); ?>
+
+                <div class="wan-field-rows" style="max-width:480px;">
+                    <div class="wan-field-row">
+                        <label for="wan-login-api-key" class="wan-field-label">
+                            <?php esc_html_e( 'API Key', 'wa-notifier' ); ?>
+                        </label>
+                        <input type="text" id="wan-login-api-key" name="api_key"
+                               class="regular-text wan-field-input" required autocomplete="off">
+                    </div>
+                    <div class="wan-field-row">
+                        <label for="wan-login-tenant-id" class="wan-field-label">
+                            <?php esc_html_e( 'Tenant ID', 'wa-notifier' ); ?>
+                        </label>
+                        <input type="text" id="wan-login-tenant-id" name="tenant_id"
+                               class="regular-text wan-field-input" required autocomplete="off"
+                               placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                    </div>
+                </div>
+
+                <button type="submit" class="button button-primary waxap-btn-primary" style="margin-top:12px;">
+                    <?php esc_html_e( 'Conectar', 'wa-notifier' ); ?>
+                </button>
+                <a href="#" id="wan-cancel-apikey" style="margin-left:12px;font-size:13px;color:#666;">
+                    <?php esc_html_e( 'Cancelar', 'wa-notifier' ); ?>
+                </a>
+            </form>
+        </div>
+
+        <script>
+        (function () {
+            var toggle  = document.getElementById('wan-toggle-apikey');
+            var cancel  = document.getElementById('wan-cancel-apikey');
+            var wrap    = document.getElementById('wan-apikey-form-wrap');
+            var regForm = document.getElementById('wan-ob-register-form');
+            if (!toggle || !wrap) return;
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrap.style.display = 'block';
+                regForm.style.display = 'none';
+                toggle.style.display = 'none';
+            });
+            if (cancel) {
+                cancel.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    wrap.style.display = 'none';
+                    regForm.style.display = 'block';
+                    toggle.style.display = '';
+                });
+            }
+        })();
+        </script>
     </div>
 
     <!-- PASO 2: Suscribirse -->
