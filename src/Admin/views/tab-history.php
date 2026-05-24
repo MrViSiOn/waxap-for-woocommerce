@@ -145,7 +145,7 @@ $status_labels = [
 
 <style>
 .waxap-history-table { margin-top: 1rem; }
-.waxap-history-msg { max-width: 320px; white-space: pre-wrap; word-break: break-word; font-size: 12px; color: #555; }
+.waxap-history-msg { max-width: 320px; white-space: pre-wrap; word-break: break-word; font-size: 12px; color: #555; text-align: left; vertical-align: top; }
 .waxap-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
 .waxap-badge--sent    { background: #d1fae5; color: #065f46; }
 .waxap-badge--failed  { background: #fee2e2; color: #991b1b; }
