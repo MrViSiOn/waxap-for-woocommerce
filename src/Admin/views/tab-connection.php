@@ -103,7 +103,7 @@ else :
             <p><?php esc_html_e( 'Introduce tu email y una contraseña para registrarte. Después elegirás tu plan.', 'wa-notifier' ); ?></p>
         </div>
 
-        <form id="wan-ob-register-form" autocomplete="off">
+        <form id="wan-ob-register-form" autocomplete="off" <?php echo $show_login ? 'style="display:none;"' : ''; ?>>
             <div class="wan-field-rows" style="max-width:480px;">
                 <div class="wan-field-row">
                     <label for="wan-ob-email" class="wan-field-label">
@@ -136,7 +136,7 @@ else :
         $login_error = isset( $_GET['login_error'] ) ? sanitize_text_field( (string) $_GET['login_error'] ) : '';
         $show_login  = $login_error !== '' || ! empty( $_GET['show_login'] );
         ?>
-        <p style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;">
+        <p style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;" <?php echo $show_login ? 'hidden' : ''; ?>>
             <a href="#" id="wan-toggle-login" style="font-size:13px;color:#666;text-decoration:none;">
                 <?php esc_html_e( '¿Ya tienes cuenta? Inicia sesión →', 'wa-notifier' ); ?>
             </a>
