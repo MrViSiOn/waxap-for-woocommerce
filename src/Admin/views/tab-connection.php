@@ -68,7 +68,7 @@ if ( $is_connected ) : ?>
         <h3><?php esc_html_e( 'Desconectar', 'wa-notifier' ); ?></h3>
         <p><?php esc_html_e( 'Elimina las credenciales y desvincula la sesión WhatsApp. La tienda dejará de enviar notificaciones.', 'wa-notifier' ); ?></p>
         <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
-              onsubmit="return confirm('<?php esc_attr_e( '¿Seguro? Se borrarán las credenciales y la sesión WhatsApp.', 'wa-notifier' ); ?>')">
+              onsubmit="return confirm('<?php esc_attr_e( '¿Seguro? Se eliminarán las credenciales del plugin. Tu número de WhatsApp seguirá conectado — puedes desvincularlo desde la pestaña Número WhatsApp.', 'wa-notifier' ); ?>')">
             <input type="hidden" name="action" value="wa_notifier_disconnect">
             <?php wp_nonce_field( 'wa_notifier_disconnect' ); ?>
             <button type="submit" class="button wan-btn-danger">
