@@ -69,10 +69,10 @@ $status_labels = [
                         : '';
                     $cell_text = '';
                     if ( $status === 'sent' || $status === 'failed' ) {
-                        $cell_text = (string) ( $row['messageSent'] ?? '' );
+                        $cell_text = trim( (string) ( $row['messageSent'] ?? '' ) );
                     }
                     if ( $status === 'failed' || $status === 'skipped' ) {
-                        $skip = (string) ( $row['skipReason'] ?? '' );
+                        $skip = trim( (string) ( $row['skipReason'] ?? '' ) );
                         if ( $skip !== '' ) {
                             $cell_text = $skip;
                         }
