@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+
+      - name: Install production dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Extract version number
+        id: ver
+        run: echo "num=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build distributable zip
+        run: |
+          plugin_dir="waxap-for-woocommerce"
+          mkdir -p "/tmp/$plugin_dir"
+          rsync -a \
+            --exclude-from=.distignore \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            . "/tmp/$plugin_dir/"
+          cd /tmp
+          zip -r9 "$GITHUB_WORKSPACE/${plugin_dir}.zip" "$plugin_dir/"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Waxap for WooCommerce v${{ steps.ver.outputs.num }}"
+          generate_release_notes: true
+          files: waxap-for-woocommerce.zip

@@ -181,10 +181,12 @@ final class Plugin {
 		if ( ! class_exists( PucFactory::class ) ) {
 			return;
 		}
-		PucFactory::buildUpdateChecker(
+		$checker = PucFactory::buildUpdateChecker(
 			'https://github.com/MrViSiOn/waxap-for-woocommerce/',
 			WA_NOTIFIER_FILE,
 			'waxap-for-woocommerce'
 		);
+		// Descargar el zip adjunto al GitHub Release en lugar del zip de fuentes.
+		$checker->getVcsApi()->enableReleaseAssets();
 	}
 }
