@@ -27,26 +27,19 @@ final class OrderEvents {
      * @param WC_Order $order
      */
     public function on_status_changed( int $order_id, string $from_status, string $to_status, WC_Order $order ): void {
-        error_log( "[WaNotifier] on_status_changed #{$order_id}: {$from_status} → {$to_status}" );
-
         if ( ! Settings::is_connected() || ! Settings::has_session() ) {
-            error_log( '[WaNotifier] SKIP: not connected or no session. connected=' . ( Settings::is_connected() ? '1' : '0' ) . ' session=' . ( Settings::has_session() ? '1' : '0' ) );
             return;
         }
 
         $notify_raw = Settings::get( 'notify_statuses' );
         $enabled    = array_filter( explode( ',', $notify_raw ) );
-        error_log( "[WaNotifier] notify_statuses raw='{$notify_raw}' enabled=" . implode( ',', $enabled ) );
 
         if ( ! empty( $enabled ) && ! in_array( $to_status, $enabled, true ) ) {
-            error_log( "[WaNotifier] SKIP: '{$to_status}' not in enabled list" );
             return;
         }
 
         $phone = self::normalize_phone( $order->get_billing_phone() );
-        error_log( "[WaNotifier] phone raw='{$order->get_billing_phone()}' normalized='{$phone}'" );
         if ( ! $phone ) {
-            error_log( '[WaNotifier] SKIP: empty phone after normalize' );
             return;
         }
 
@@ -78,13 +71,7 @@ final class OrderEvents {
             $payload['lastInboundAt'] = $last_inbound;
         }
 
-        error_log( '[WaNotifier] send_event payload=' . wp_json_encode( $payload ) );
-        $result = ( new WrapperClient() )->send_event( $payload );
-        if ( is_wp_error( $result ) ) {
-            error_log( '[WaNotifier] send_event ERROR: ' . $result->get_error_message() );
-        } else {
-            error_log( '[WaNotifier] send_event OK' );
-        }
+        ( new WrapperClient() )->send_event( $payload );
     }
 
     private static function normalize_phone( string $raw ): string {
