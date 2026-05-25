@@ -997,3 +997,39 @@
 .wan-ob-step {
     max-width: 560px;
 }
+
+/* ---- Plan selector (onboarding paso 2) ---- */
+
+.wan-plan-select-wrap {
+    margin-bottom: 20px;
+}
+
+.wan-plan-select {
+    width: 100%;
+    max-width: 480px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--wax-text);
+    border: 2px solid var(--wax-border);
+    border-radius: var(--wax-radius);
+    background: var(--wax-white);
+    cursor: pointer;
+    appearance: auto;
+    line-height: 1.5;
+    transition: border-color .15s;
+}
+
+.wan-plan-select:focus {
+    border-color: var(--wax-green);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15);
+}
+
+.wan-plan-desc-text {
+    max-width: 480px;
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--wax-text-muted);
+    min-height: 1.4em;
+}

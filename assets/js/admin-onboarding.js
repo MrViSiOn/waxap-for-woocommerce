@@ -8,10 +8,18 @@
         pollCount: 0,
         MAX_POLLS: 72, // 6 minutos a intervalos de 5s
 
+        planDescs: {
+            basic:    'Ideal para tiendas pequeñas. Hasta 100 WhatsApps al mes. Puedes cancelar cuando quieras.',
+            pro:      'Para tiendas con más volumen. Hasta 200 WhatsApps al mes. Puedes cancelar cuando quieras.',
+            lifetime: 'Un solo pago, sin cuotas mensuales. Mensajes ilimitados de por vida.',
+        },
+
         init: function () {
             $('#wan-ob-register-form').on('submit', this.onRegister.bind(this));
             $(document).on('click', '#wan-ob-pay-btn', this.onPayClick.bind(this));
             $(document).on('click', '#wan-ob-already-paid', this.onAlreadyPaid.bind(this));
+            $(document).on('change', '#wan-plan-select', this.onPlanChange.bind(this));
+            this.onPlanChange();
 
             // Si hay tenant_id pero no api_key, arrancamos en el paso 2
             if (this.data.step === '2') {
@@ -61,14 +69,21 @@
 
         /* ---- Paso 2: Pago ---- */
 
+        onPlanChange: function () {
+            var plan = $('#wan-plan-select').val() || 'basic';
+            $('#wan-plan-desc').text(this.planDescs[plan] || '');
+        },
+
         onPayClick: function () {
-            var $btn = $('#wan-ob-pay-btn');
+            var $btn  = $('#wan-ob-pay-btn');
+            var plan  = $('#wan-plan-select').val() || 'basic';
             $btn.prop('disabled', true).text('Preparando enlace de pago…');
             $('#wan-ob-pay-error').hide().text('');
 
             $.post(OB.data.ajaxUrl, {
                 action: 'wan_onboarding_checkout_url',
                 nonce:  OB.data.nonce,
+                plan:   plan,
             })
             .done(function (res) {
                 if (!res.success) {

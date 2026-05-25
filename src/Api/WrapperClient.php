@@ -97,19 +97,25 @@ final class WrapperClient {
     /**
      * Crea una Stripe Checkout Session y devuelve la URL de pago.
      *
+     * @param string $plan 'basic'|'pro'|'lifetime'
      * @return array{url:string}|WP_Error
      */
-    public function get_checkout_url( string $tenant_id ): array|WP_Error {
-        $success_url = add_query_arg(
-            [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'success' ],
-            admin_url( 'admin.php' )
-        );
-        $cancel_url = add_query_arg(
-            [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'cancelled' ],
-            admin_url( 'admin.php' )
-        );
+    public function get_checkout_url( string $tenant_id, string $plan = 'basic', string $success_url = '', string $cancel_url = '' ): array|WP_Error {
+        if ( ! $success_url ) {
+            $success_url = add_query_arg(
+                [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'success' ],
+                admin_url( 'admin.php' )
+            );
+        }
+        if ( ! $cancel_url ) {
+            $cancel_url = add_query_arg(
+                [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'cancelled' ],
+                admin_url( 'admin.php' )
+            );
+        }
         return $this->request( 'POST', '/v1/billing/checkout', [
             'tenantId'   => $tenant_id,
+            'plan'       => $plan,
             'successUrl' => $success_url,
             'cancelUrl'  => $cancel_url,
         ] );

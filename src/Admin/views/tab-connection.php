@@ -320,12 +320,17 @@ else :
     <!-- PASO 2: Suscribirse -->
     <div id="wan-ob-step-2" class="wan-ob-step" <?php echo $ob_step !== '2' ? 'style="display:none"' : ''; ?>>
         <div class="waxap-section-header">
-            <h2><?php esc_html_e( 'Activa tu suscripción', 'wa-notifier' ); ?></h2>
-            <p>
-                <?php esc_html_e( 'Plan Waxap: ', 'wa-notifier' ); ?>
-                <strong><?php esc_html_e( '5 €/mes · 100 mensajes al mes', 'wa-notifier' ); ?></strong>.
-                <?php esc_html_e( 'Cancela cuando quieras.', 'wa-notifier' ); ?>
-            </p>
+            <h2><?php esc_html_e( 'Elige tu plan', 'wa-notifier' ); ?></h2>
+            <p><?php esc_html_e( 'Selecciona el plan que mejor se adapta a tu tienda.', 'wa-notifier' ); ?></p>
+        </div>
+
+        <div class="wan-plan-select-wrap">
+            <select id="wan-plan-select" name="wan_plan" class="wan-plan-select">
+                <option value="basic">⚡ Básico — 6 €/mes · 100 mensajes al mes</option>
+                <option value="pro">🚀 Pro — 12 €/mes · 200 mensajes al mes</option>
+                <option value="lifetime">✨ Vitalicio — 200 € pago único · Mensajes ilimitados para siempre</option>
+            </select>
+            <p id="wan-plan-desc" class="wan-plan-desc-text"></p>
         </div>
 
         <?php
@@ -339,7 +344,7 @@ else :
 
         <p id="wan-ob-pay-error" class="wan-error" style="display:none;color:#cc1818;margin:0 0 12px;"></p>
 
-        <button id="wan-ob-pay-btn" class="button button-primary waxap-btn-primary" style="font-size:15px;padding:6px 20px;">
+        <button id="wan-ob-pay-btn" class="button button-primary waxap-btn-primary" style="font-size:15px;padding:6px 20px;margin-top:8px;">
             <?php esc_html_e( 'Ir a pagar →', 'wa-notifier' ); ?>
         </button>
 

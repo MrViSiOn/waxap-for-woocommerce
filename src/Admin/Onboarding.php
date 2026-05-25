@@ -56,8 +56,18 @@ final class Onboarding {
             wp_send_json_error( [ 'message' => 'No hay cuenta registrada. Completa el paso anterior.' ] );
         }
 
-        $client   = new WrapperClient();
-        $result   = $client->get_checkout_url( $tenant_id );
+        $allowed = [ 'basic', 'pro', 'lifetime' ];
+        $plan    = sanitize_key( (string) ( $_POST['plan'] ?? 'basic' ) );
+        if ( ! in_array( $plan, $allowed, true ) ) {
+            $plan = 'basic';
+        }
+
+        $base        = admin_url( 'admin.php?page=wa-notifier&tab=connection' );
+        $success_url = add_query_arg( 'payment', 'success', $base );
+        $cancel_url  = add_query_arg( 'payment', 'cancelled', $base );
+
+        $client = new WrapperClient();
+        $result = $client->get_checkout_url( $tenant_id, $plan, $success_url, $cancel_url );
 
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( [ 'message' => $result->get_error_message() ] );
