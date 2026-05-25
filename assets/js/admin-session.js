@@ -18,8 +18,8 @@
                 if (e.key === 'Escape') WAN.onModalClose();
             });
 
-            // Si ya hay sesión, refrescamos el estado en pantalla sin recargar la página.
-            if (waNotifierData.hasSession === '1') {
+            // Solo en el tab "Número WhatsApp" (donde el modal existe en el DOM).
+            if (waNotifierData.hasSession === '1' && $('#wa-notifier-modal').length) {
                 this.refreshStatus();
             }
         },
@@ -259,10 +259,12 @@
         /* ---- Modal ---- */
 
         openModal: function () {
+            var $modal = $('#wa-notifier-modal');
+            if (!$modal.length) return;
             $('#wa-notifier-qr-img').attr('src', '').hide();
             $('#wa-notifier-qr-loading').html('Generando QR…').show();
             this.clearError('#wa-notifier-modal-error');
-            $('#wa-notifier-modal').attr('aria-hidden', 'false').show();
+            $modal.attr('aria-hidden', 'false').show();
             $('body').css('overflow', 'hidden');
         },
 
