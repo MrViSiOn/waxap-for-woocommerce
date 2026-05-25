@@ -65,4 +65,4 @@ The plugin sends order metadata (order ID, status) and customer phone numbers to
 
 == Privacy ==
 
-This plugin sends order metadata and customer phone numbers to the Waxap SaaS service (api.waxap.shop) to deliver WhatsApp notifications. The customer must opt-in via a checkbox at checkout before their phone number is transmitted. See our Privacy Policy: https://waxap.shop/privacy
+This plugin sends order metadata and customer phone numbers to the Waxap SaaS service (api.waxap.shop) to deliver WhatsApp notifications. The customer must opt-in via a checkbox at checkout before their phone number is transmitted. See our Privacy Policy: https://waxap.shop/privacidad/

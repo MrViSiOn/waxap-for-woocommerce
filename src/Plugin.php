@@ -21,6 +21,7 @@ use WaNotifier\Api\WrapperClient;
 use WaNotifier\Checkout\CheckoutOptIn;
 use WaNotifier\Emails\OrderEmails;
 use WaNotifier\Orders\OrderEvents;
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 /**
  * Clase principal del plugin. Inicializa todos los componentes y registra los hooks de WordPress.
@@ -29,6 +30,7 @@ final class Plugin {
 
 	/** Inicializa todos los componentes del plugin y registra los hooks de WordPress. */
 	public function boot(): void {
+		$this->setup_updater();
 		Settings::maybe_migrate_status_keys();
 
 		if ( is_admin() ) {
@@ -169,5 +171,20 @@ final class Plugin {
 				],
 			);
 		}
+	}
+
+	/**
+	 * Registra el checker de actualizaciones automáticas desde GitHub.
+	 * Una vez el plugin esté en WordPress.org, WP usará el canal oficial en su lugar.
+	 */
+	private function setup_updater(): void {
+		if ( ! class_exists( PucFactory::class ) ) {
+			return;
+		}
+		PucFactory::buildUpdateChecker(
+			'https://github.com/MrViSiOn/waxap-for-woocommerce/',
+			WA_NOTIFIER_FILE,
+			'waxap-for-woocommerce'
+		);
 	}
 }

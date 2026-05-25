@@ -4,8 +4,8 @@
 /.gitignore
 /.editorconfig
 /phpcs.xml.dist
+/composer.json
 /composer.lock
-/vendor/
 /node_modules/
 /bin/
 /assets/css/.gitkeep
@@ -16,3 +16,7 @@
 /docker-compose.yml
 /docker-compose.dev.yml
 /.docker/
+/vendor/squizlabs/
+/vendor/wp-coding-standards/
+/vendor/phpcsstandards/
+/vendor/dealerdirect/
