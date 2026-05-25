@@ -10,144 +10,163 @@ declare(strict_types=1);
 
 namespace WaNotifier\Ajax;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WaNotifier\Api\WrapperClient;
 use WaNotifier\Settings;
 
+/**
+ * Manejadores WP AJAX para el flujo de vinculación y gestión de sesión WhatsApp.
+ */
 final class SessionAjax {
 
-    public function register(): void {
-        foreach ( [ 'register', 'create_session', 'poll_session', 'disconnect', 'send_test' ] as $action ) {
-            add_action( "wp_ajax_wa_notifier_{$action}", [ $this, "handle_{$action}" ] );
-        }
-    }
+	/** Registra los hooks AJAX del plugin. */
+	public function register(): void {
+		foreach ( [ 'register', 'create_session', 'poll_session', 'disconnect', 'send_test' ] as $action ) {
+			add_action( "wp_ajax_wa_notifier_{$action}", [ $this, "handle_{$action}" ] );
+		}
+	}
 
-    public function handle_register(): void {
-        $this->verify_nonce();
+	/** Procesa el registro de la tienda en el wrapper. */
+	public function handle_register(): void {
+		$this->verify_nonce();
 
-        $wrapper_url = sanitize_url( (string) ( $_POST['wrapper_url'] ?? '' ) );
-        $email       = sanitize_email( (string) ( $_POST['email'] ?? '' ) );
-        $password    = (string) ( $_POST['password'] ?? '' );
+		$wrapper_url = sanitize_url( wp_unslash( (string) ( $_POST['wrapper_url'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$email       = sanitize_email( wp_unslash( (string) ( $_POST['email'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$password    = wp_unslash( (string) ( $_POST['password'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passwords must not be sanitized
 
-        if ( ! $wrapper_url || ! $email || ! $password ) {
-            wp_send_json_error( [ 'message' => __( 'Todos los campos son obligatorios.', 'wa-notifier' ) ] );
-        }
+		if ( ! $wrapper_url || ! $email || ! $password ) {
+			wp_send_json_error( [ 'message' => __( 'Todos los campos son obligatorios.', 'waxap-for-woocommerce' ) ] );
+		}
 
-        Settings::set( 'wrapper_url', $wrapper_url );
+		Settings::set( 'wrapper_url', $wrapper_url );
 
-        $client = new WrapperClient();
-        $result = $client->register( $email, $password );
+		$client = new WrapperClient();
+		$result = $client->register( $email, $password );
 
-        if ( is_wp_error( $result ) ) {
-            wp_send_json_error( [ 'message' => $result->get_error_message() ] );
-        }
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
 
-        Settings::set( 'api_key', (string) ( $result['apiKey'] ?? '' ) );
-        Settings::set( 'tenant_id', (string) ( $result['tenantId'] ?? '' ) );
-        Settings::set( 'hmac_secret', (string) ( $result['hmacSecret'] ?? '' ) );
+		Settings::set( 'api_key', (string) ( $result['apiKey'] ?? '' ) );
+		Settings::set( 'tenant_id', (string) ( $result['tenantId'] ?? '' ) );
+		Settings::set( 'hmac_secret', (string) ( $result['hmacSecret'] ?? '' ) );
 
-        wp_send_json_success();
-    }
+		wp_send_json_success();
+	}
 
-    public function handle_create_session(): void {
-        $this->verify_nonce();
+	/** Crea una nueva sesión WhatsApp en el wrapper. */
+	public function handle_create_session(): void {
+		$this->verify_nonce();
 
-        $client     = new WrapperClient();
-        $site_name  = sanitize_key( get_bloginfo( 'name' ) ) ?: 'tienda';
-        $session    = $client->create_session( $site_name );
+		$client    = new WrapperClient();
+		$site_name = sanitize_key( get_bloginfo( 'name' ) );
+		if ( ! $site_name ) {
+			$site_name = 'tienda';
+		}
+		$session = $client->create_session( $site_name );
 
-        if ( is_wp_error( $session ) ) {
-            wp_send_json_error( [ 'message' => $session->get_error_message() ] );
-        }
+		if ( is_wp_error( $session ) ) {
+			wp_send_json_error( [ 'message' => $session->get_error_message() ] );
+		}
 
-        $session_id = (string) ( $session['id'] ?? '' );
-        Settings::set( 'session_id', $session_id );
+		$session_id = (string) ( $session['id'] ?? '' );
+		Settings::set( 'session_id', $session_id );
 
-        wp_send_json_success( [ 'sessionId' => $session_id ] );
-    }
+		wp_send_json_success( [ 'sessionId' => $session_id ] );
+	}
 
-    public function handle_poll_session(): void {
-        $this->verify_nonce();
+	/** Consulta el estado de la sesión activa y retorna el QR si corresponde. */
+	public function handle_poll_session(): void {
+		$this->verify_nonce();
 
-        $session_id = Settings::get( 'session_id' );
-        if ( ! $session_id ) {
-            wp_send_json_error( [ 'message' => 'No hay sesión activa.' ] );
-        }
+		$session_id = Settings::get( 'session_id' );
+		if ( ! $session_id ) {
+			wp_send_json_error( [ 'message' => 'No hay sesión activa.' ] );
+		}
 
-        $client = new WrapperClient();
-        $status = $client->get_session( $session_id );
+		$client = new WrapperClient();
+		$status = $client->get_session( $session_id );
 
-        if ( is_wp_error( $status ) ) {
-            wp_send_json_error( [ 'message' => $status->get_error_message() ] );
-        }
+		if ( is_wp_error( $status ) ) {
+			wp_send_json_error( [ 'message' => $status->get_error_message() ] );
+		}
 
-        $current_status = (string) ( $status['status'] ?? 'unknown' );
-        $qr             = null;
+		$current_status = (string) ( $status['status'] ?? 'unknown' );
+		$qr             = null;
 
-        // Solicitar QR si la sesión está esperando escaneo
-        if ( in_array( $current_status, [ 'initializing', 'qr_ready' ], true ) ) {
-            $qr_response = $client->get_qr( $session_id );
-            if ( ! is_wp_error( $qr_response ) ) {
-                $qr = $qr_response['qr'] ?? null;
-            }
-        }
+		// Solicitar QR si la sesión está esperando escaneo.
+		if ( in_array( $current_status, [ 'initializing', 'qr_ready' ], true ) ) {
+			$qr_response = $client->get_qr( $session_id );
+			if ( ! is_wp_error( $qr_response ) ) {
+				$qr = $qr_response['qr'] ?? null;
+			}
+		}
 
-        $phone = (string) ( $status['phoneNumber'] ?? '' );
+		$phone = (string) ( $status['phoneNumber'] ?? '' );
 
-        // Persistir número vinculado al alcanzar estado ready
-        if ( $current_status === 'ready' && $phone ) {
-            Settings::set( 'phone_number', $phone );
-        }
+		// Persistir número vinculado al alcanzar estado ready.
+		if ( 'ready' === $current_status && $phone ) {
+			Settings::set( 'phone_number', $phone );
+		}
 
-        wp_send_json_success( [
-            'status' => $current_status,
-            'qr'     => $qr,
-            'phone'  => $phone ?: null,
-        ] );
-    }
+		wp_send_json_success(
+			[
+				'status' => $current_status,
+				'qr'     => $qr,
+				'phone'  => $phone ? $phone : null,
+			]
+		);
+	}
 
-    public function handle_disconnect(): void {
-        $this->verify_nonce();
+	/** Desconecta la sesión activa y limpia las credenciales almacenadas. */
+	public function handle_disconnect(): void {
+		$this->verify_nonce();
 
-        $session_id = Settings::get( 'session_id' );
-        if ( $session_id ) {
-            $client = new WrapperClient();
-            $client->delete_session( $session_id );
-        }
+		$session_id = Settings::get( 'session_id' );
+		if ( $session_id ) {
+			$client = new WrapperClient();
+			$client->delete_session( $session_id );
+		}
 
-        Settings::delete( 'session_id' );
-        Settings::delete( 'phone_number' );
+		Settings::delete( 'session_id' );
+		Settings::delete( 'phone_number' );
 
-        wp_send_json_success();
-    }
+		wp_send_json_success();
+	}
 
-    public function handle_send_test(): void {
-        $this->verify_nonce();
+	/** Envía un mensaje de prueba al número indicado. */
+	public function handle_send_test(): void {
+		$this->verify_nonce();
 
-        $to = sanitize_text_field( (string) ( $_POST['to'] ?? '' ) );
-        if ( ! $to ) {
-            wp_send_json_error( [ 'message' => __( 'El número de teléfono es obligatorio.', 'wa-notifier' ) ] );
-        }
+		$to = sanitize_text_field( wp_unslash( (string) ( $_POST['to'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! $to ) {
+			wp_send_json_error( [ 'message' => __( 'El número de teléfono es obligatorio.', 'waxap-for-woocommerce' ) ] );
+		}
 
-        $session_id = Settings::get( 'session_id' );
-        if ( ! $session_id ) {
-            wp_send_json_error( [ 'message' => __( 'No hay sesión activa.', 'wa-notifier' ) ] );
-        }
+		$session_id = Settings::get( 'session_id' );
+		if ( ! $session_id ) {
+			wp_send_json_error( [ 'message' => __( 'No hay sesión activa.', 'waxap-for-woocommerce' ) ] );
+		}
 
-        $message = sanitize_text_field( (string) ( $_POST['message'] ?? '' ) );
+		$message = sanitize_text_field( wp_unslash( (string) ( $_POST['message'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-        $client = new WrapperClient();
-        $result = $client->send_test( $session_id, $to, $message );
+		$client = new WrapperClient();
+		$result = $client->send_test( $session_id, $to, $message );
 
-        if ( is_wp_error( $result ) ) {
-            wp_send_json_error( [ 'message' => $result->get_error_message() ] );
-        }
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
 
-        wp_send_json_success( [ 'messageId' => $result['messageId'] ?? '' ] );
-    }
+		wp_send_json_success( [ 'messageId' => $result['messageId'] ?? '' ] );
+	}
 
-    private function verify_nonce(): void {
-        if ( ! check_ajax_referer( 'wa_notifier_ajax', 'nonce', false ) ) {
-            wp_send_json_error( [ 'message' => 'Nonce inválido.' ], 403 );
-        }
-    }
+	/** Verifica el nonce AJAX antes de procesar cualquier petición. */
+	private function verify_nonce(): void {
+		if ( ! check_ajax_referer( 'wa_notifier_ajax', 'nonce', false ) ) {
+			wp_send_json_error( [ 'message' => 'Nonce inválido.' ], 403 );
+		}
+	}
 }

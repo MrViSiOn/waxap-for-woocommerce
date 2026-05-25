@@ -10,239 +10,319 @@ declare(strict_types=1);
 
 namespace WaNotifier\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WaNotifier\Settings;
 use WP_Error;
 
+/**
+ * Cliente HTTP para comunicarse con la API REST del wrapper Waxap.
+ */
 final class WrapperClient {
 
-    private string $base_url;
-    private string $api_key;
-    private string $tenant_id;
+	/**
+	 * URL base del wrapper (sin barra final).
+	 *
+	 * @var string
+	 */
+	private string $base_url;
 
-    public function __construct() {
-        $this->base_url  = rtrim( Settings::get( 'wrapper_url' ), '/' );
-        $this->api_key   = Settings::get( 'api_key' );
-        $this->tenant_id = Settings::get( 'tenant_id' );
-    }
+	/**
+	 * API key del tenant autenticado.
+	 *
+	 * @var string
+	 */
+	private string $api_key;
 
-    /**
-     * Registra la tienda y devuelve apiKey + tenantId.
-     *
-     * @return array{apiKey:string,tenantId:string}|WP_Error
-     */
-    public function register( string $email, string $password ): array|WP_Error {
-        return $this->request( 'POST', '/v1/auth/register', [
-            'email'    => $email,
-            'password' => $password,
-        ] );
-    }
+	/**
+	 * ID del tenant en el wrapper.
+	 *
+	 * @var string
+	 */
+	private string $tenant_id;
 
-    /**
-     * Crea una sesión en el wrapper y la arranca.
-     *
-     * @return array{id:string,status:string,...}|WP_Error
-     */
-    public function create_session( string $name ): array|WP_Error {
-        return $this->request( 'POST', '/v1/sessions', [ 'name' => $name ], auth: true );
-    }
+	/** Inicializa el cliente con las credenciales almacenadas en Settings. */
+	public function __construct() {
+		$this->base_url  = rtrim( Settings::get( 'wrapper_url' ), '/' );
+		$this->api_key   = Settings::get( 'api_key' );
+		$this->tenant_id = Settings::get( 'tenant_id' );
+	}
 
-    /**
-     * Obtiene el estado actual de la sesión.
-     *
-     * @return array{id:string,status:string,...}|WP_Error
-     */
-    public function get_session( string $session_id ): array|WP_Error {
-        return $this->request( 'GET', "/v1/sessions/{$session_id}", auth: true );
-    }
+	/**
+	 * Registra la tienda y devuelve apiKey + tenantId.
+	 *
+	 * @param string $email    Email del administrador de la tienda.
+	 * @param string $password Contraseña de la cuenta.
+	 * @return array{apiKey:string,tenantId:string}|WP_Error
+	 */
+	public function register( string $email, string $password ): array|WP_Error {
+		return $this->request(
+			'POST',
+			'/v1/auth/register',
+			[
+				'email'    => $email,
+				'password' => $password,
+			]
+		);
+	}
 
-    /**
-     * Obtiene el QR actual (para polling).
-     *
-     * @return array{sessionId:string,qr:string}|WP_Error
-     */
-    public function get_qr( string $session_id ): array|WP_Error {
-        return $this->request( 'GET', "/v1/sessions/{$session_id}/qr", auth: true );
-    }
+	/**
+	 * Crea una sesión en el wrapper y la arranca.
+	 *
+	 * @param string $name Nombre identificador de la sesión.
+	 * @return array{id:string,status:string,...}|WP_Error
+	 */
+	public function create_session( string $name ): array|WP_Error {
+		return $this->request( 'POST', '/v1/sessions', [ 'name' => $name ], auth: true );
+	}
 
-    /**
-     * Envía un mensaje de prueba a un número de teléfono.
-     *
-     * @return array{messageId:string}|WP_Error
-     */
-    public function send_test( string $session_id, string $to, string $message = '' ): array|WP_Error {
-        $body = [ 'to' => $to ];
-        if ( $message !== '' ) {
-            $body['message'] = $message;
-        }
-        return $this->request( 'POST', "/v1/sessions/{$session_id}/send-test", $body, auth: true );
-    }
+	/**
+	 * Obtiene el estado actual de la sesión.
+	 *
+	 * @param string $session_id ID de la sesión a consultar.
+	 * @return array{id:string,status:string,...}|WP_Error
+	 */
+	public function get_session( string $session_id ): array|WP_Error {
+		return $this->request( 'GET', "/v1/sessions/{$session_id}", auth: true );
+	}
 
-    /**
-     * Elimina la sesión.
-     */
-    public function delete_session( string $session_id ): true|WP_Error {
-        $result = $this->request( 'DELETE', "/v1/sessions/{$session_id}", auth: true );
-        return is_wp_error( $result ) ? $result : true;
-    }
+	/**
+	 * Obtiene el QR actual (para polling).
+	 *
+	 * @param string $session_id ID de la sesión de la que obtener el QR.
+	 * @return array{sessionId:string,qr:string}|WP_Error
+	 */
+	public function get_qr( string $session_id ): array|WP_Error {
+		return $this->request( 'GET', "/v1/sessions/{$session_id}/qr", auth: true );
+	}
 
-    /**
-     * Consulta el estado de activación de un tenant (polling post-pago Stripe).
-     *
-     * @return array{status:string,apiKey?:string,hmacSecret?:string}|WP_Error
-     */
-    public function get_auth_status( string $tenant_id ): array|WP_Error {
-        return $this->request( 'GET', "/v1/auth/status/{$tenant_id}" );
-    }
+	/**
+	 * Envía un mensaje de prueba a un número de teléfono.
+	 *
+	 * @param string $session_id ID de la sesión desde la que enviar.
+	 * @param string $to         Número de destino en formato internacional.
+	 * @param string $message    Texto del mensaje (opcional).
+	 * @return array{messageId:string}|WP_Error
+	 */
+	public function send_test( string $session_id, string $to, string $message = '' ): array|WP_Error {
+		$body = [ 'to' => $to ];
+		if ( '' !== $message ) {
+			$body['message'] = $message;
+		}
+		return $this->request( 'POST', "/v1/sessions/{$session_id}/send-test", $body, auth: true );
+	}
 
-    /**
-     * Crea una Stripe Checkout Session y devuelve la URL de pago.
-     *
-     * @param string $plan 'basic'|'pro'|'lifetime'
-     * @return array{url:string}|WP_Error
-     */
-    public function get_checkout_url( string $tenant_id, string $plan = 'basic', string $success_url = '', string $cancel_url = '' ): array|WP_Error {
-        if ( ! $success_url ) {
-            $success_url = add_query_arg(
-                [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'success' ],
-                admin_url( 'admin.php' )
-            );
-        }
-        if ( ! $cancel_url ) {
-            $cancel_url = add_query_arg(
-                [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'cancelled' ],
-                admin_url( 'admin.php' )
-            );
-        }
-        return $this->request( 'POST', '/v1/billing/checkout', [
-            'tenantId'   => $tenant_id,
-            'plan'       => $plan,
-            'successUrl' => $success_url,
-            'cancelUrl'  => $cancel_url,
-        ] );
-    }
+	/**
+	 * Elimina la sesión del wrapper.
+	 *
+	 * @param string $session_id ID de la sesión a eliminar.
+	 * @return true|WP_Error
+	 */
+	public function delete_session( string $session_id ): true|WP_Error {
+		$result = $this->request( 'DELETE', "/v1/sessions/{$session_id}", auth: true );
+		return is_wp_error( $result ) ? $result : true;
+	}
 
-    /**
-     * Devuelve el uso mensual y estado de suscripción del tenant.
-     *
-     * @return array{status:string,used:int,quota:int,quotaResetAt:string|null}|WP_Error
-     */
-    public function get_usage(): array|WP_Error {
-        return $this->request( 'GET', '/v1/billing/usage', auth: true );
-    }
+	/**
+	 * Consulta el estado de activación de un tenant (polling post-pago Stripe).
+	 *
+	 * @param string $tenant_id ID del tenant a consultar.
+	 * @return array{status:string,apiKey?:string,hmacSecret?:string}|WP_Error
+	 */
+	public function get_auth_status( string $tenant_id ): array|WP_Error {
+		return $this->request( 'GET', "/v1/auth/status/{$tenant_id}" );
+	}
 
-    /**
-     * Obtiene la URL del portal de cliente Stripe para gestionar la suscripción.
-     *
-     * @return array{url:string}|WP_Error
-     */
-    public function get_billing_portal_url( string $return_url = '' ): array|WP_Error {
-        $body = $return_url ? [ 'returnUrl' => $return_url ] : [];
-        return $this->request( 'POST', '/v1/billing/portal', $body, auth: true );
-    }
+	/**
+	 * Crea una Stripe Checkout Session y devuelve la URL de pago.
+	 *
+	 * @param string $tenant_id   ID del tenant que realiza el pago.
+	 * @param string $plan        Plan a contratar: 'basic', 'pro' o 'lifetime'.
+	 * @param string $success_url URL de redirección tras pago exitoso.
+	 * @param string $cancel_url  URL de redirección si el pago es cancelado.
+	 * @return array{url:string}|WP_Error
+	 */
+	public function get_checkout_url( string $tenant_id, string $plan = 'basic', string $success_url = '', string $cancel_url = '' ): array|WP_Error {
+		if ( ! $success_url ) {
+			$success_url = add_query_arg(
+				[
+					'page'    => 'waxap',
+					'tab'     => 'connection',
+					'payment' => 'success',
+				],
+				admin_url( 'admin.php' )
+			);
+		}
+		if ( ! $cancel_url ) {
+			$cancel_url = add_query_arg(
+				[
+					'page'    => 'waxap',
+					'tab'     => 'connection',
+					'payment' => 'cancelled',
+				],
+				admin_url( 'admin.php' )
+			);
+		}
+		return $this->request(
+			'POST',
+			'/v1/billing/checkout',
+			[
+				'tenantId'   => $tenant_id,
+				'plan'       => $plan,
+				'successUrl' => $success_url,
+				'cancelUrl'  => $cancel_url,
+			]
+		);
+	}
 
-    /**
-     * Inicia sesión con email y contraseña y devuelve las credenciales del tenant.
-     *
-     * @return array{tenantId:string,apiKey:string,hmacSecret:string}|WP_Error
-     */
-    public function login( string $email, string $password ): array|WP_Error {
-        return $this->request( 'POST', '/v1/auth/login', [
-            'email'    => $email,
-            'password' => $password,
-        ] );
-    }
+	/**
+	 * Devuelve el uso mensual y estado de suscripción del tenant.
+	 *
+	 * @return array{status:string,used:int,quota:int,quotaResetAt:string|null}|WP_Error
+	 */
+	public function get_usage(): array|WP_Error {
+		return $this->request( 'GET', '/v1/billing/usage', auth: true );
+	}
 
-    /**
-     * Devuelve el historial de mensajes WhatsApp enviados por este tenant.
-     *
-     * @return array{data: array<int,array<string,mixed>>, total: int, limit: int, offset: int}|WP_Error
-     */
-    public function get_message_log( int $limit = 20, int $offset = 0 ): array|WP_Error {
-        return $this->request( 'GET', '/v1/messages', query: [
-            'limit'  => (string) $limit,
-            'offset' => (string) $offset,
-        ], auth: true );
-    }
+	/**
+	 * Obtiene la URL del portal de cliente Stripe para gestionar la suscripción.
+	 *
+	 * @param string $return_url URL de retorno tras salir del portal (opcional).
+	 * @return array{url:string}|WP_Error
+	 */
+	public function get_billing_portal_url( string $return_url = '' ): array|WP_Error {
+		$body = $return_url ? [ 'returnUrl' => $return_url ] : [];
+		return $this->request( 'POST', '/v1/billing/portal', $body, auth: true );
+	}
 
-    /**
-     * Envía un evento de cambio de estado de pedido al wrapper, firmado con HMAC.
-     *
-     * @param array<string,mixed> $payload
-     * @return true|WP_Error
-     */
-    public function send_event( array $payload ): true|WP_Error {
-        $secret    = Settings::get( 'hmac_secret' );
-        $timestamp = (string) time();
-        $body      = (string) wp_json_encode( $payload );
-        $signature = 'sha256=' . hash_hmac( 'sha256', $timestamp . '.' . $body, $secret );
+	/**
+	 * Inicia sesión con email y contraseña y devuelve las credenciales del tenant.
+	 *
+	 * @param string $email    Email del administrador.
+	 * @param string $password Contraseña de la cuenta.
+	 * @return array{tenantId:string,apiKey:string,hmacSecret:string}|WP_Error
+	 */
+	public function login( string $email, string $password ): array|WP_Error {
+		return $this->request(
+			'POST',
+			'/v1/auth/login',
+			[
+				'email'    => $email,
+				'password' => $password,
+			]
+		);
+	}
 
-        $result = $this->request( 'POST', '/v1/events', $payload, extra_headers: [
-            'x-tenant-id' => $this->tenant_id,
-            'x-timestamp' => $timestamp,
-            'x-signature' => $signature,
-        ] );
+	/**
+	 * Devuelve el historial de mensajes WhatsApp enviados por este tenant.
+	 *
+	 * @param int $limit  Número máximo de registros a devolver.
+	 * @param int $offset Desplazamiento para paginación.
+	 * @return array{data: array<int,array<string,mixed>>, total: int, limit: int, offset: int}|WP_Error
+	 */
+	public function get_message_log( int $limit = 20, int $offset = 0 ): array|WP_Error {
+		return $this->request(
+			'GET',
+			'/v1/messages',
+			query: [
+				'limit'  => (string) $limit,
+				'offset' => (string) $offset,
+			],
+			auth: true
+		);
+	}
 
-        return is_wp_error( $result ) ? $result : true;
-    }
+	/**
+	 * Envía un evento de cambio de estado de pedido al wrapper, firmado con HMAC.
+	 *
+	 * @param array<string,mixed> $payload Datos del evento a enviar.
+	 * @return true|WP_Error
+	 */
+	public function send_event( array $payload ): true|WP_Error {
+		$secret    = Settings::get( 'hmac_secret' );
+		$timestamp = (string) time();
+		$body      = (string) wp_json_encode( $payload );
+		$signature = 'sha256=' . hash_hmac( 'sha256', $timestamp . '.' . $body, $secret );
 
-    /**
-     * @param array<string,mixed>  $body
-     * @param array<string,string> $extra_headers
-     * @param array<string,string> $query  Parámetros de query string para peticiones GET.
-     * @return array<string,mixed>|WP_Error
-     */
-    private function request(
-        string $method,
-        string $path,
-        array $body = [],
-        bool $auth = false,
-        array $extra_headers = [],
-        array $query = [],
-    ): array|WP_Error {
-        $url = $this->base_url . $path;
-        if ( ! empty( $query ) ) {
-            $url = add_query_arg( $query, $url );
-        }
-        $args = [
-            'method'  => $method,
-            'timeout' => 10,
-            'headers' => [ 'Content-Type' => 'application/json' ],
-        ];
+		$result = $this->request(
+			'POST',
+			'/v1/events',
+			$payload,
+			extra_headers: [
+				'x-tenant-id' => $this->tenant_id,
+				'x-timestamp' => $timestamp,
+				'x-signature' => $signature,
+			]
+		);
 
-        if ( $auth ) {
-            $args['headers']['x-tenant-id'] = $this->tenant_id;
-            $args['headers']['x-api-key']   = $this->api_key;
-        }
+		return is_wp_error( $result ) ? $result : true;
+	}
 
-        if ( ! empty( $extra_headers ) ) {
-            $args['headers'] = array_merge( $args['headers'], $extra_headers );
-        }
+	/**
+	 * Realiza una petición HTTP a la API del wrapper.
+	 *
+	 * @param string               $method        Método HTTP (GET, POST, DELETE…).
+	 * @param string               $path          Ruta del endpoint (p.ej. '/v1/sessions').
+	 * @param array<string,mixed>  $body          Cuerpo de la petición (se serializa como JSON).
+	 * @param bool                 $auth          Si es true, adjunta las cabeceras de autenticación.
+	 * @param array<string,string> $extra_headers Cabeceras adicionales a incluir en la petición.
+	 * @param array<string,string> $query         Parámetros de query string para peticiones GET.
+	 * @return array<string,mixed>|WP_Error
+	 */
+	private function request(
+		string $method,
+		string $path,
+		array $body = [],
+		bool $auth = false,
+		array $extra_headers = [],
+		array $query = [],
+	): array|WP_Error {
+		$url = $this->base_url . $path;
+		if ( ! empty( $query ) ) {
+			$url = add_query_arg( $query, $url );
+		}
+		$args = [
+			'method'  => $method,
+			'timeout' => 10,
+			'headers' => [ 'Content-Type' => 'application/json' ],
+		];
 
-        if ( ! empty( $body ) ) {
-            $args['body'] = wp_json_encode( $body );
-        }
+		if ( $auth ) {
+			$args['headers']['x-tenant-id'] = $this->tenant_id;
+			$args['headers']['x-api-key']   = $this->api_key;
+		}
 
-        $response = wp_remote_request( $url, $args );
+		if ( ! empty( $extra_headers ) ) {
+			$args['headers'] = array_merge( $args['headers'], $extra_headers );
+		}
 
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
+		if ( ! empty( $body ) ) {
+			$args['body'] = wp_json_encode( $body );
+		}
 
-        $code = wp_remote_retrieve_response_code( $response );
-        $data = json_decode( wp_remote_retrieve_body( $response ), true );
+		$response = wp_remote_request( $url, $args );
 
-        if ( $code >= 400 ) {
-            $message = is_array( $data ) ? ( $data['message'] ?? 'Error desconocido' ) : 'Error desconocido';
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
 
-            // Si la API rechaza las credenciales en una request autenticada, el tenant
-            // fue cancelado/desactivado desde el servidor. Limpiamos las credenciales locales.
-            if ( $auth && $code === 401 && Settings::is_connected() ) {
-                Settings::disconnect();
-            }
+		$code = wp_remote_retrieve_response_code( $response );
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-            return new WP_Error( 'wrapper_error', $message, [ 'status' => $code ] );
-        }
+		if ( $code >= 400 ) {
+			$message = is_array( $data ) ? ( $data['message'] ?? 'Error desconocido' ) : 'Error desconocido';
 
-        return is_array( $data ) ? $data : [];
-    }
+			// Si la API rechaza las credenciales en una request autenticada, el tenant
+			// fue cancelado/desactivado desde el servidor. Limpiamos las credenciales locales.
+			if ( $auth && 401 === $code && Settings::is_connected() ) {
+				Settings::disconnect();
+			}
+
+			return new WP_Error( 'wrapper_error', $message, [ 'status' => $code ] );
+		}
+
+		return is_array( $data ) ? $data : [];
+	}
 }

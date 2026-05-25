@@ -51,7 +51,7 @@ services:
       # Montaje del plugin: el código del repo es directamente el plugin instalado.
       # ATENCIÓN: el path es relativo a este docker-compose.yml.
       # Estructura asumida: este archivo está en wa-notifier-wp-plugin/
-      - .:/var/www/html/wp-content/plugins/wa-notifier:rw
+      - .:/var/www/html/wp-content/plugins/waxap-for-woocommerce:rw
       # MU plugin para forzar SMTP a MailHog
       - ./.docker/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
     extra_hosts:
@@ -101,7 +101,7 @@ services:
     user: "33:33"  # www-data
     volumes:
       - wordpress_data:/var/www/html
-      - .:/var/www/html/wp-content/plugins/wa-notifier:rw
+      - .:/var/www/html/wp-content/plugins/waxap-for-woocommerce:rw
     networks:
       - wa-notifier-dev
     depends_on:

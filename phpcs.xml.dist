@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="WA Notifier" xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+    <description>WordPress Coding Standards — WA Notifier plugin.</description>
+
+    <file>waxap-for-woocommerce.php</file>
+    <file>uninstall.php</file>
+    <file>src/</file>
+
+    <exclude-pattern>vendor/</exclude-pattern>
+    <exclude-pattern>node_modules/</exclude-pattern>
+    <exclude-pattern>assets/</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <!-- WordPress version mínima soportada -->
+    <config name="minimum_supported_wp_version" value="6.2"/>
+    <!-- PHP mínimo soportado -->
+    <config name="testVersion" value="8.1-"/>
+    <!-- Text domain para i18n -->
+    <config name="text_domain" type="array">waxap-for-woocommerce</config>
+
+    <rule ref="WordPress-Extra"/>
+    <rule ref="WordPress-Docs"/>
+
+    <!--
+        PSR-4 autoloading: los nombres de fichero siguen el nombre de la clase
+        (AdminMenu.php, WrapperClient.php…). El estándar WordPress espera
+        class-admin-menu.php, pero Composer y los namespaces exigen CamelCase.
+        Excluimos la comprobación de nombres de fichero en src/.
+    -->
+    <rule ref="WordPress.Files.FileName">
+        <exclude-pattern>src/*</exclude-pattern>
+    </rule>
+
+    <!--
+        WordPress prefiere la sintaxis corta de arrays [] desde WP 5.x.
+        WPCS 3.x no incluye este sniff; lo añade PHPCSExtra/Universal.
+        Lo excluimos para que phpcbf no lo convierta a array().
+    -->
+    <rule ref="Universal.Arrays.DisallowShortArraySyntax">
+        <exclude-pattern>*</exclude-pattern>
+    </rule>
+
+    <!--
+        manage_woocommerce es una capability legítima de WooCommerce.
+        Sin esto PHPCS la marca como desconocida.
+    -->
+    <rule ref="WordPress.WP.Capabilities">
+        <properties>
+            <property name="custom_capabilities" type="array">
+                <element value="manage_woocommerce"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        Las vistas de admin leen parámetros $_GET de solo lectura
+        (navegación de pestañas, mensajes de éxito) que son establecidos por
+        wp_safe_redirect() del mismo plugin. No son entradas de formulario
+        peligrosas; no requieren nonce.
+    -->
+    <rule ref="WordPress.Security.NonceVerification">
+        <exclude-pattern>src/Admin/views/*</exclude-pattern>
+    </rule>
+
+    <!--
+        Prefijos válidos del plugin. Necesario para que PrefixAllGlobals
+        no marque como no prefijadas las variables que usan waxap_, wa_notifier_,
+        WaNotifier o WA_NOTIFIER_.
+    -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="waxap"/>
+                <element value="wa_notifier"/>
+                <element value="WaNotifier"/>
+                <element value="WA_NOTIFIER"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

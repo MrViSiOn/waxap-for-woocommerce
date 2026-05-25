@@ -8,7 +8,7 @@
  * Requires PHP:      8.1
  * Author:            drappsinfo
  * Author URI:        https://drappsinfo.com
- * Text Domain:       wa-notifier
+ * Text Domain:       waxap-for-woocommerce
  * Domain Path:       /languages
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 define( 'WA_NOTIFIER_VERSION', '0.3.1' );
@@ -28,15 +28,18 @@ define( 'WA_NOTIFIER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WA_NOTIFIER_URL', plugin_dir_url( __FILE__ ) );
 
 // HPOS compatibility declaration (WooCommerce 8+).
-add_action( 'before_woocommerce_init', function () {
-    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
-            'custom_order_tables',
-            __FILE__,
-            true
-        );
-    }
-} );
+add_action(
+	'before_woocommerce_init',
+	function () {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+				'custom_order_tables',
+				__FILE__,
+				true
+			);
+		}
+	}
+);
 
 require_once WA_NOTIFIER_PATH . 'vendor/autoload.php';
 ( new \WaNotifier\Plugin() )->boot();

@@ -10,102 +10,128 @@ declare(strict_types=1);
 
 namespace WaNotifier\Orders;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WaNotifier\Api\WrapperClient;
 use WaNotifier\Settings;
 use WC_Order;
 
+/**
+ * Escucha cambios de estado en pedidos WooCommerce y los envía al wrapper Waxap.
+ */
 final class OrderEvents {
 
-    public function register(): void {
-        add_action( 'woocommerce_order_status_changed', [ $this, 'on_status_changed' ], 10, 4 );
-    }
+	/** Registra el hook de cambio de estado de pedido. */
+	public function register(): void {
+		add_action( 'woocommerce_order_status_changed', [ $this, 'on_status_changed' ], 10, 4 );
+	}
 
-    /**
-     * @param int      $order_id
-     * @param string   $from_status Estado anterior (sin prefijo 'wc-')
-     * @param string   $to_status   Estado nuevo (sin prefijo 'wc-')
-     * @param WC_Order $order
-     */
-    public function on_status_changed( int $order_id, string $from_status, string $to_status, WC_Order $order ): void {
-        if ( ! Settings::is_connected() || ! Settings::has_session() ) {
-            return;
-        }
+	/**
+	 * Procesa el cambio de estado y envía el evento al wrapper si corresponde.
+	 *
+	 * @param int      $order_id    ID del pedido.
+	 * @param string   $from_status Estado anterior (sin prefijo 'wc-').
+	 * @param string   $to_status   Estado nuevo (sin prefijo 'wc-').
+	 * @param WC_Order $order       Objeto del pedido.
+	 */
+	public function on_status_changed( int $order_id, string $from_status, string $to_status, WC_Order $order ): void {
+		if ( ! Settings::is_connected() || ! Settings::has_session() ) {
+			return;
+		}
 
-        $notify_raw = Settings::get( 'notify_statuses' );
-        $enabled    = array_filter( explode( ',', $notify_raw ) );
+		$notify_raw = Settings::get( 'notify_statuses' );
+		$enabled    = array_filter( explode( ',', $notify_raw ) );
 
-        if ( ! empty( $enabled ) && ! in_array( $to_status, $enabled, true ) ) {
-            return;
-        }
+		if ( ! empty( $enabled ) && ! in_array( $to_status, $enabled, true ) ) {
+			return;
+		}
 
-        $phone = self::normalize_phone( $order->get_billing_phone() );
-        if ( ! $phone ) {
-            return;
-        }
+		$phone = self::normalize_phone( $order->get_billing_phone() );
+		if ( ! $phone ) {
+			return;
+		}
 
-        // Pedidos nuevos llevan el meta del checkbox del checkout.
-        // Pedidos anteriores a la activación del checkbox no tienen el meta → asumimos opt-in.
-        $opt_in_meta = $order->get_meta( '_wa_notifier_opt_in', true );
-        $opt_in      = ( '' === $opt_in_meta ) ? true : ( '1' === $opt_in_meta );
+		// Pedidos nuevos llevan el meta del checkbox del checkout.
+		// Pedidos anteriores a la activación del checkbox no tienen el meta → asumimos opt-in.
+		$opt_in_meta = $order->get_meta( '_wa_notifier_opt_in', true );
+		$opt_in      = ( '' === $opt_in_meta ) ? true : ( '1' === $opt_in_meta );
 
-        $first = $order->get_billing_first_name();
-        $last  = $order->get_billing_last_name();
-        $name  = trim( $first . ' ' . $last ) ?: 'Cliente';
+		$first    = $order->get_billing_first_name();
+		$last     = $order->get_billing_last_name();
+		$name_raw = trim( $first . ' ' . $last );
+		$name     = $name_raw ? $name_raw : 'Cliente';
 
-        $payload = [
-            'orderId'       => (string) $order_id,
-            'orderStatus'   => $to_status,
-            'customerPhone' => $phone,
-            'customerName'  => $name,
-            'whatsappOptIn' => $opt_in,
-        ];
+		$payload = [
+			'orderId'       => (string) $order_id,
+			'orderStatus'   => $to_status,
+			'customerPhone' => $phone,
+			'customerName'  => $name,
+			'whatsappOptIn' => $opt_in,
+		];
 
-        $message = $this->resolve_template( $order, $to_status );
-        if ( $message ) {
-            $payload['message'] = $message;
-        }
+		$message = $this->resolve_template( $order, $to_status );
+		if ( $message ) {
+			$payload['message'] = $message;
+		}
 
-        // Incluir ventana 24h solo si el cliente escribió antes
-        $last_inbound = $order->get_meta( '_wa_notifier_last_inbound_at', true );
-        if ( $last_inbound ) {
-            $payload['lastInboundAt'] = $last_inbound;
-        }
+		// Incluir ventana 24h solo si el cliente escribió antes.
+		$last_inbound = $order->get_meta( '_wa_notifier_last_inbound_at', true );
+		if ( $last_inbound ) {
+			$payload['lastInboundAt'] = $last_inbound;
+		}
 
-        ( new WrapperClient() )->send_event( $payload );
-    }
+		( new WrapperClient() )->send_event( $payload );
+	}
 
-    private static function normalize_phone( string $raw ): string {
-        $digits = preg_replace( '/\D/', '', $raw );
-        if ( ! $digits ) {
-            return '';
-        }
-        $digits       = ltrim( $digits, '0' );
-        $country_code = Settings::get( 'phone_country_code' ) ?: '34';
-        if ( ! str_starts_with( $digits, $country_code ) ) {
-            $digits = $country_code . $digits;
-        }
-        return $digits;
-    }
+	/**
+	 * Normaliza un número de teléfono añadiendo el prefijo de país si es necesario.
+	 *
+	 * @param string $raw Número de teléfono en crudo.
+	 * @return string Número normalizado solo con dígitos, o cadena vacía si inválido.
+	 */
+	private static function normalize_phone( string $raw ): string {
+		$digits = preg_replace( '/\D/', '', $raw );
+		if ( ! $digits ) {
+			return '';
+		}
+		$digits           = ltrim( $digits, '0' );
+		$country_code_val = Settings::get( 'phone_country_code' );
+		$country_code     = $country_code_val ? $country_code_val : '34';
+		if ( ! str_starts_with( $digits, $country_code ) ) {
+			$digits = $country_code . $digits;
+		}
+		return $digits;
+	}
 
-    private function resolve_template( WC_Order $order, string $status ): string {
-        $template = Settings::get( 'template_' . $status );
-        if ( '' === $template ) {
-            return '';
-        }
+	/**
+	 * Resuelve la plantilla de mensaje para el estado de pedido dado.
+	 *
+	 * @param WC_Order $order  Objeto del pedido.
+	 * @param string   $status Clave de estado del pedido (sin prefijo 'wc-').
+	 * @return string Mensaje con variables sustituidas, o cadena vacía si no hay plantilla.
+	 */
+	private function resolve_template( WC_Order $order, string $status ): string {
+		$template = Settings::get( 'template_' . $status );
+		if ( '' === $template ) {
+			return '';
+		}
 
-        $statuses     = wc_get_order_statuses();
-        $status_label = $statuses[ 'wc-' . $status ] ?? $status;
+		$statuses     = wc_get_order_statuses();
+		$status_label = $statuses[ 'wc-' . $status ] ?? $status;
 
-        return str_replace(
-            [ '{nombre}', '{pedido}', '{estado}', '{total}', '{enlace}' ],
-            [
-                trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ) ?: 'Cliente',
-                (string) $order->get_id(),
-                $status_label,
-                html_entity_decode( strip_tags( wc_price( $order->get_total() ) ) ),
-                $order->get_view_order_url(),
-            ],
-            $template
-        );
-    }
+		$full_name = trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() );
+		return str_replace(
+			[ '{nombre}', '{pedido}', '{estado}', '{total}', '{enlace}' ],
+			[
+				$full_name ? $full_name : 'Cliente',
+				(string) $order->get_id(),
+				$status_label,
+				html_entity_decode( wp_strip_all_tags( wc_price( $order->get_total() ) ) ),
+				$order->get_view_order_url(),
+			],
+			$template
+		);
+	}
 }
