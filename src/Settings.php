@@ -41,6 +41,41 @@ final class Settings {
         return (string) get_option( self::PREFIX . $key, $default );
     }
 
+    /**
+     * Corrige datos guardados con ltrim() en lugar de substr() para claves de estado WC.
+     * ltrim('wc-completed','wc-') devuelve 'ompleted'; ltrim('wc-cancelled','wc-') devuelve 'ancelled'.
+     * Solo se ejecuta una vez (guarda una flag en wp_options).
+     */
+    public static function maybe_migrate_status_keys(): void {
+        if ( get_option( self::PREFIX . 'migrated_status_keys_v1' ) ) {
+            return;
+        }
+
+        $bad_good = [ 'ompleted' => 'completed', 'ancelled' => 'cancelled' ];
+
+        // Fix notify_statuses
+        $raw      = (string) get_option( self::PREFIX . 'notify_statuses', '' );
+        $statuses = array_filter( explode( ',', $raw ) );
+        $fixed    = array_map( fn( $s ) => $bad_good[ $s ] ?? $s, $statuses );
+        if ( $statuses !== $fixed ) {
+            update_option( self::PREFIX . 'notify_statuses', implode( ',', $fixed ), false );
+        }
+
+        // Fix orphaned template keys
+        foreach ( $bad_good as $bad => $good ) {
+            $bad_val  = get_option( self::PREFIX . 'template_' . $bad, null );
+            $good_val = get_option( self::PREFIX . 'template_' . $good, null );
+            if ( $bad_val !== null ) {
+                if ( $good_val === null || $good_val === '' ) {
+                    update_option( self::PREFIX . 'template_' . $good, $bad_val, false );
+                }
+                delete_option( self::PREFIX . 'template_' . $bad );
+            }
+        }
+
+        update_option( self::PREFIX . 'migrated_status_keys_v1', '1', false );
+    }
+
     public static function set( string $key, string $value ): void {
         update_option( self::PREFIX . $key, $value, false );
     }

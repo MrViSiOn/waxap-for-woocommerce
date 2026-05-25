@@ -17,6 +17,15 @@
             if (this.data.step === '2') {
                 this.showStep(2);
             }
+
+            // El usuario vuelve de Stripe (pago completado o en proceso):
+            // ocultar el botón de pago y arrancar el polling directamente.
+            if (this.data.paymentReturned === '1' && this.data.step === '2') {
+                $('#wan-ob-pay-btn').hide();
+                $('#wan-ob-pay-error').hide();
+                $('#wan-ob-polling-wrap').show();
+                this.startPolling();
+            }
         },
 
         /* ---- Paso 1: Registro ---- */

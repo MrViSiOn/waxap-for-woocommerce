@@ -90,6 +90,19 @@ final class AdminMenu {
 
         if ( $tab === 'connection' ) {
             $is_connected = Settings::is_connected();
+
+            // Usuario vuelve de Stripe con pago completado y webhook ya procesado:
+            // redirigir a la vista de "cuenta activada" limpiando el parámetro payment.
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            if ( isset( $_GET['payment'] ) && $_GET['payment'] === 'success' && $is_connected ) {
+                wp_safe_redirect( add_query_arg( [
+                    'page' => self::SLUG,
+                    'tab'  => 'connection',
+                    'ob'   => 'done',
+                ], admin_url( 'admin.php' ) ) );
+                exit;
+            }
+
             $wrapper_url  = Settings::get( 'wrapper_url' );
             $api_key      = Settings::get( 'api_key' );
             $tenant_id    = Settings::get( 'tenant_id' );
@@ -121,7 +134,7 @@ final class AdminMenu {
             $statuses  = [];
             $templates = [];
             foreach ( wc_get_order_statuses() as $wc_key => $label ) {
-                $key              = ltrim( $wc_key, 'wc-' );
+                $key              = substr( $wc_key, 3 );
                 $meta             = $status_meta[ $key ] ?? [];
                 $statuses[ $key ] = [
                     'label' => $label,
@@ -171,7 +184,7 @@ final class AdminMenu {
 
         check_admin_referer( 'wa_notifier_save_notifications' );
 
-        $valid    = array_map( fn( string $k ) => ltrim( $k, 'wc-' ), array_keys( wc_get_order_statuses() ) );
+        $valid    = array_map( fn( string $k ) => substr( $k, 3 ), array_keys( wc_get_order_statuses() ) );
         $posted   = isset( $_POST['wan_notify_statuses'] ) && is_array( $_POST['wan_notify_statuses'] )
             ? $_POST['wan_notify_statuses']
             : [];

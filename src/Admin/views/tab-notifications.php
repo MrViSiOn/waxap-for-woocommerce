@@ -76,6 +76,7 @@ if ( isset( $_GET['updated'] ) ) : ?>
                     type="button"
                     class="wan-edit-tpl-btn"
                     data-panel="<?php echo $panel_id; ?>"
+                    data-has-content="<?php echo ! empty( $templates[ $key ] ) ? '1' : '0'; ?>"
                     aria-expanded="false"
                     aria-label="<?php esc_attr_e( 'Editar plantilla de mensaje', 'wa-notifier' ); ?>"
                     title="<?php esc_attr_e( 'Editar mensaje', 'wa-notifier' ); ?>"
@@ -118,6 +119,14 @@ if ( isset( $_GET['updated'] ) ) : ?>
 
 <script>
 (function () {
+    function openPanel(btn) {
+        var panel = document.getElementById(btn.dataset.panel);
+        if (!panel) return;
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-expanded', 'true');
+        panel.classList.add('is-open');
+    }
+
     // Accordion: pencil button toggles template panel
     document.querySelectorAll('.wan-edit-tpl-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -128,6 +137,11 @@ if ( isset( $_GET['updated'] ) ) : ?>
             panel.classList.toggle('is-open', open);
         });
     });
+
+    // After saving (?updated=1), auto-open panels that have content
+    if (window.location.search.indexOf('updated=1') !== -1) {
+        document.querySelectorAll('.wan-edit-tpl-btn[data-has-content="1"]').forEach(openPanel);
+    }
 
     // Char counters
     document.querySelectorAll('.wan-template-textarea').forEach(function (ta) {

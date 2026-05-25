@@ -178,6 +178,22 @@
     color: var(--wax-green-dark);
 }
 
+.wan-edit-tpl-btn {
+    position: relative;
+}
+
+.wan-edit-tpl-btn[data-has-content="1"]::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 7px;
+    height: 7px;
+    background: var(--wax-green-dark);
+    border-radius: 50%;
+    border: 1.5px solid var(--wax-white);
+}
+
 /* ── Collapsible template panel ──────────────────────────── */
 
 .wan-tpl-panel {

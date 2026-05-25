@@ -328,6 +328,15 @@ else :
             </p>
         </div>
 
+        <?php
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( isset( $_GET['payment'] ) && $_GET['payment'] === 'cancelled' ) :
+        ?>
+        <p class="wan-inline-notice wan-inline-notice--warning" style="margin-bottom:12px;">
+            <?php esc_html_e( 'Pago cancelado. Puedes intentarlo de nuevo cuando quieras.', 'wa-notifier' ); ?>
+        </p>
+        <?php endif; ?>
+
         <p id="wan-ob-pay-error" class="wan-error" style="display:none;color:#cc1818;margin:0 0 12px;"></p>
 
         <button id="wan-ob-pay-btn" class="button button-primary waxap-btn-primary" style="font-size:15px;padding:6px 20px;">

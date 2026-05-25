@@ -21,11 +21,17 @@ use WaNotifier\Orders\OrderEvents;
 final class Plugin {
 
     public function boot(): void {
+        Settings::maybe_migrate_status_keys();
+
         if ( is_admin() ) {
             $admin_menu = new AdminMenu();
             add_action( 'admin_menu', [ $admin_menu, 'register' ] );
             add_action( 'admin_init', [ $admin_menu, 'register_form_handlers' ] );
             add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
+            add_filter(
+                'plugin_action_links_' . plugin_basename( WA_NOTIFIER_FILE ),
+                [ $this, 'add_settings_link' ]
+            );
         }
 
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_checkout_assets' ] );
@@ -54,6 +60,13 @@ final class Plugin {
             ( new OrderEmails() )->register();
             ( new CheckoutOptIn() )->register();
         } );
+    }
+
+    public function add_settings_link( array $links ): array {
+        $url  = esc_url( admin_url( 'admin.php?page=wa-notifier' ) );
+        $text = esc_html__( 'Ajustes', 'wa-notifier' );
+        array_unshift( $links, "<a href=\"{$url}\">{$text}</a>" );
+        return $links;
     }
 
     public function enqueue_checkout_assets(): void {
@@ -116,13 +129,17 @@ final class Plugin {
                 true,
             );
 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $payment_returned = isset( $_GET['payment'] ) && $_GET['payment'] === 'success';
+
             wp_localize_script(
                 'wa-notifier-onboarding',
                 'waxapOnboarding',
                 [
-                    'nonce'   => wp_create_nonce( 'wa_notifier_ajax' ),
-                    'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-                    'step'    => Settings::get( 'tenant_id' ) ? '2' : '1',
+                    'nonce'          => wp_create_nonce( 'wa_notifier_ajax' ),
+                    'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
+                    'step'           => Settings::get( 'tenant_id' ) ? '2' : '1',
+                    'paymentReturned' => $payment_returned ? '1' : '0',
                 ],
             );
         }

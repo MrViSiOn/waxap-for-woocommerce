@@ -95,12 +95,24 @@ final class WrapperClient {
     }
 
     /**
-     * Obtiene la URL del Payment Link de Stripe con tenantId incrustado.
+     * Crea una Stripe Checkout Session y devuelve la URL de pago.
      *
      * @return array{url:string}|WP_Error
      */
     public function get_checkout_url( string $tenant_id ): array|WP_Error {
-        return $this->request( 'GET', '/v1/billing/checkout-url', query: [ 'tenantId' => $tenant_id ] );
+        $success_url = add_query_arg(
+            [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'success' ],
+            admin_url( 'admin.php' )
+        );
+        $cancel_url = add_query_arg(
+            [ 'page' => 'wa-notifier', 'tab' => 'connection', 'payment' => 'cancelled' ],
+            admin_url( 'admin.php' )
+        );
+        return $this->request( 'POST', '/v1/billing/checkout', [
+            'tenantId'   => $tenant_id,
+            'successUrl' => $success_url,
+            'cancelUrl'  => $cancel_url,
+        ] );
     }
 
     /**
