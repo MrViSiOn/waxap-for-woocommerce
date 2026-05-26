@@ -13,7 +13,12 @@
 		},
 
 		formatPhone: function ( phone ) {
-			// Strip @c.us / @lid / @g.us suffixes, keep only the number part
+			return '+' + phone.replace( /@[a-z.]+$/i, '' );
+		},
+
+		convLabel: function ( conv ) {
+			if ( conv.contactName ) return conv.contactName;
+			var phone = conv.displayPhone || conv.phone;
 			return '+' + phone.replace( /@[a-z.]+$/i, '' );
 		},
 
@@ -78,7 +83,9 @@
 
 			$( '.waxap-conv-item' ).removeClass( 'active' );
 			$( '.waxap-conv-item[data-phone="' + phone + '"]' ).addClass( 'active' );
-			$( '#waxap-thread-header-phone' ).text( self.formatPhone( phone ) );
+			var convData = $( '.waxap-conv-item[data-phone="' + phone + '"]' ).data( 'conv' ) || {};
+			var headerLabel = convData.contactName || ( '+' + ( convData.displayPhone || phone ).replace( /@[a-z.]+$/i, '' ) );
+			$( '#waxap-thread-header-phone' ).text( headerLabel );
 			$( '#waxap-inbox-empty' ).hide();
 			$( '#waxap-thread' ).css( 'display', 'flex' );
 			$( '#waxap-thread-messages' ).html( '<div class="waxap-thread-loading">Cargando...</div>' );
@@ -160,13 +167,17 @@
 				html += '<div class="waxap-conv-item' + isActive + '" data-phone="' + self.escAttr( conv.phone ) + '">';
 				html += '<div class="waxap-conv-avatar">' + initial + '</div>';
 				html += '<div class="waxap-conv-info">';
-				html += '<div class="waxap-conv-phone">' + self.escHtml( self.formatPhone( conv.phone ) ) + '</div>';
+				html += '<div class="waxap-conv-phone">' + self.escHtml( self.convLabel( conv ) ) + '</div>';
 				html += '<div class="waxap-conv-preview">' + self.escHtml( preview ) + '</div>';
 				html += '</div>';
 				html += '<div class="waxap-conv-meta"><span class="waxap-conv-time">' + self.escHtml( timeStr ) + '</span>' + badge + '</div>';
 				html += '</div>';
 			} );
 			$list.html( html );
+			// Attach conv objects for header lookup
+			$.each( conversations, function ( i, conv ) {
+				$list.find( '.waxap-conv-item[data-phone="' + self.escAttr( conv.phone ) + '"]' ).data( 'conv', conv );
+			} );
 		},
 
 		isScrolledToBottom: function ( $el ) {
