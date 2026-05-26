@@ -23,32 +23,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Abort and show admin notice if WooCommerce is not active.
-if ( ! function_exists( 'WC' ) ) {
-	add_action(
-		'admin_notices',
-		function () {
-			echo '<div class="notice notice-error"><p>'
-				. wp_kses(
-					sprintf(
-						/* translators: %s: WooCommerce plugin name as a link */
-						__( '<strong>Waxap</strong> requiere %s para funcionar. Por favor, instala y activa WooCommerce primero.', 'waxap-for-woocommerce' ),
-						'<a href="https://wordpress.org/plugins/woocommerce/">WooCommerce</a>'
-					),
-					[ 'strong' => [], 'a' => [ 'href' => [] ] ]
-				)
-				. '</p></div>';
-		}
-	);
-	return;
-}
-
 define( 'WA_NOTIFIER_VERSION', '0.3.3' );
 define( 'WA_NOTIFIER_FILE', __FILE__ );
 define( 'WA_NOTIFIER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WA_NOTIFIER_URL', plugin_dir_url( __FILE__ ) );
 
 // HPOS compatibility declaration (WooCommerce 8+).
+// Debe registrarse a nivel de archivo porque before_woocommerce_init se dispara
+// desde dentro del propio plugins_loaded de WooCommerce.
 add_action(
 	'before_woocommerce_init',
 	function () {
@@ -62,5 +44,30 @@ add_action(
 	}
 );
 
-require_once WA_NOTIFIER_PATH . 'vendor/autoload.php';
-( new \WaNotifier\Plugin() )->boot();
+// Boot dentro de plugins_loaded para garantizar que WooCommerce ya está cargado.
+add_action(
+	'plugins_loaded',
+	function () {
+		if ( ! function_exists( 'WC' ) ) {
+			add_action(
+				'admin_notices',
+				function () {
+					echo '<div class="notice notice-error"><p>'
+						. wp_kses(
+							sprintf(
+								/* translators: %s: WooCommerce plugin name as a link */
+								__( '<strong>Waxap</strong> requiere %s para funcionar. Por favor, instala y activa WooCommerce primero.', 'waxap-for-woocommerce' ),
+								'<a href="https://wordpress.org/plugins/woocommerce/">WooCommerce</a>'
+							),
+							[ 'strong' => [], 'a' => [ 'href' => [] ] ]
+						)
+						. '</p></div>';
+				}
+			);
+			return;
+		}
+
+		require_once WA_NOTIFIER_PATH . 'vendor/autoload.php';
+		( new \WaNotifier\Plugin() )->boot();
+	}
+);
