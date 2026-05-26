@@ -12,6 +12,11 @@
 			this.startPolling();
 		},
 
+		formatPhone: function ( phone ) {
+			// Strip @c.us / @lid / @g.us suffixes, keep only the number part
+			return '+' + phone.replace( /@[a-z.]+$/i, '' );
+		},
+
 		bindEvents: function () {
 			var self = this;
 
@@ -73,7 +78,7 @@
 
 			$( '.waxap-conv-item' ).removeClass( 'active' );
 			$( '.waxap-conv-item[data-phone="' + phone + '"]' ).addClass( 'active' );
-			$( '#waxap-thread-header-phone' ).text( '+' + phone );
+			$( '#waxap-thread-header-phone' ).text( self.formatPhone( phone ) );
 			$( '#waxap-inbox-empty' ).hide();
 			$( '#waxap-thread' ).show();
 			$( '#waxap-thread-messages' ).html( '<div class="waxap-thread-loading">Cargando...</div>' );
@@ -155,7 +160,7 @@
 				html += '<div class="waxap-conv-item' + isActive + '" data-phone="' + self.escAttr( conv.phone ) + '">';
 				html += '<div class="waxap-conv-avatar">' + initial + '</div>';
 				html += '<div class="waxap-conv-info">';
-				html += '<div class="waxap-conv-phone">+' + self.escHtml( conv.phone ) + '</div>';
+				html += '<div class="waxap-conv-phone">' + self.escHtml( self.formatPhone( conv.phone ) ) + '</div>';
 				html += '<div class="waxap-conv-preview">' + self.escHtml( preview ) + '</div>';
 				html += '</div>';
 				html += '<div class="waxap-conv-meta"><span class="waxap-conv-time">' + self.escHtml( timeStr ) + '</span>' + badge + '</div>';
