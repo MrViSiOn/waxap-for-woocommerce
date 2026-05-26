@@ -80,7 +80,7 @@
 			$( '.waxap-conv-item[data-phone="' + phone + '"]' ).addClass( 'active' );
 			$( '#waxap-thread-header-phone' ).text( self.formatPhone( phone ) );
 			$( '#waxap-inbox-empty' ).hide();
-			$( '#waxap-thread' ).show();
+			$( '#waxap-thread' ).css( 'display', 'flex' );
 			$( '#waxap-thread-messages' ).html( '<div class="waxap-thread-loading">Cargando...</div>' );
 
 			$.post( waxapInbox.ajaxUrl, {

@@ -50,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div class="waxap-conv-item" data-phone="<?php echo esc_attr( $phone ); ?>">
 							<div class="waxap-conv-avatar"><?php echo esc_html( $initial ); ?></div>
 							<div class="waxap-conv-info">
-								<div class="waxap-conv-phone">+<?php echo esc_html( $phone ); ?></div>
+								<div class="waxap-conv-phone">+<?php echo esc_html( preg_replace( '/@[a-z.]+$/i', '', $phone ) ); ?></div>
 								<div class="waxap-conv-preview"><?php echo esc_html( $preview ); ?></div>
 							</div>
 							<div class="waxap-conv-meta">
