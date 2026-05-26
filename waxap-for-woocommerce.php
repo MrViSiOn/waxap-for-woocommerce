@@ -14,12 +14,33 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * WC requires at least: 8.0
  * WC tested up to:   8.9
+ * Requires Plugins:  woocommerce
  *
  * @package WaNotifier
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
+
+// Abort and show admin notice if WooCommerce is not active.
+if ( ! function_exists( 'WC' ) ) {
+	add_action(
+		'admin_notices',
+		function () {
+			echo '<div class="notice notice-error"><p>'
+				. wp_kses(
+					sprintf(
+						/* translators: %s: WooCommerce plugin name as a link */
+						__( '<strong>Waxap</strong> requiere %s para funcionar. Por favor, instala y activa WooCommerce primero.', 'waxap-for-woocommerce' ),
+						'<a href="https://wordpress.org/plugins/woocommerce/">WooCommerce</a>'
+					),
+					[ 'strong' => [], 'a' => [ 'href' => [] ] ]
+				)
+				. '</p></div>';
+		}
+	);
+	return;
 }
 
 define( 'WA_NOTIFIER_VERSION', '0.3.3' );
