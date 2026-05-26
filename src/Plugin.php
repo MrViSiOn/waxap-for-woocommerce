@@ -72,14 +72,20 @@ final class Plugin {
 		$onboarding = new Onboarding();
 		$onboarding->register();
 
-		add_action(
-			'woocommerce_loaded',
-			function () {
-				( new OrderEvents() )->register();
-				( new OrderEmails() )->register();
-				( new CheckoutOptIn() )->register();
-			}
-		);
+		$init_wc_components = function () {
+			( new OrderEvents() )->register();
+			( new OrderEmails() )->register();
+			( new CheckoutOptIn() )->register();
+		};
+
+		// WooCommerce 10+ dispara woocommerce_loaded en plugins_loaded con prioridad -1,
+		// antes de que nuestro callback (prioridad 10) se ejecute. Si ya se disparó, llamamos
+		// directamente; si no, esperamos al hook.
+		if ( did_action( 'woocommerce_loaded' ) ) {
+			$init_wc_components();
+		} else {
+			add_action( 'woocommerce_loaded', $init_wc_components );
+		}
 	}
 
 	/**
