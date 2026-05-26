@@ -85,6 +85,7 @@
 			} ).done( function ( res ) {
 				if ( res.success ) {
 					self.renderMessages( res.data );
+					self.scrollToBottom( $( '#waxap-thread-messages' ) );
 					// Mark as read and clear badge
 					self.markRead( phone );
 				} else {
@@ -163,6 +164,15 @@
 			$list.html( html );
 		},
 
+		isScrolledToBottom: function ( $el ) {
+			var el = $el[0];
+			return el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+		},
+
+		scrollToBottom: function ( $el ) {
+			$el.scrollTop( $el[0].scrollHeight );
+		},
+
 		renderMessages: function ( messages ) {
 			var self = this;
 			var $container = $( '#waxap-thread-messages' );
@@ -170,6 +180,7 @@
 				$container.html( '<div class="waxap-thread-empty-msgs">Sin mensajes aún.</div>' );
 				return;
 			}
+			var wasAtBottom = self.isScrolledToBottom( $container );
 			var html = '';
 			$.each( messages, function ( i, msg ) {
 				var dir = msg.direction === 'outbound' ? 'outbound' : 'inbound';
@@ -181,7 +192,9 @@
 				html += '</div>';
 			} );
 			$container.html( html );
-			$container.scrollTop( $container[0].scrollHeight );
+			if ( wasAtBottom ) {
+				self.scrollToBottom( $container );
+			}
 		},
 
 		appendMessage: function ( msg ) {
@@ -193,7 +206,7 @@
 			$msg.text( msg.body || '' );
 			$msg.append( '<div class="waxap-msg-time">' + self.escHtml( timeStr ) + '</div>' );
 			$container.append( $msg );
-			$container.scrollTop( $container[0].scrollHeight );
+			self.scrollToBottom( $container );
 		},
 
 		formatTime: function ( iso ) {
