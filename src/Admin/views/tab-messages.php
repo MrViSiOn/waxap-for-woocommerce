@@ -164,7 +164,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	gap: 10px;
 }
 #waxap-inbox-empty .dashicons { font-size: 52px; width: 52px; height: 52px; color: #ddd; }
-#waxap-thread { display: flex; flex-direction: column; flex: 1; }
+#waxap-thread { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 .waxap-thread-header {
 	padding: 12px 16px;
 	border-bottom: 1px solid #dcdcde;
@@ -180,6 +180,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 .waxap-thread-header .dashicons { color: #25d366; }
 #waxap-thread-messages {
 	flex: 1;
+	min-height: 0;
 	overflow-y: auto;
 	padding: 16px;
 	display: flex;
