@@ -35,6 +35,7 @@ final class AdminMenu {
 		'notifications' => 'Notificaciones',
 		'email'         => 'Email branding',
 		'history'       => 'Historial',
+		'messages'      => 'Mensajes',
 	];
 
 	/** Registra el submenú de Waxap bajo WooCommerce. */
@@ -214,6 +215,15 @@ final class AdminMenu {
 			$log    = is_wp_error( $result ) ? null : $result;
 			$error  = is_wp_error( $result ) ? $result->get_error_message() : null;
 			include __DIR__ . '/views/tab-history.php';
+			return;
+		}
+
+		if ( 'messages' === $tab ) {
+			$client        = new WrapperClient();
+			$result        = $client->get_inbox_conversations( 30 );
+			$conversations = is_wp_error( $result ) ? null : ( $result['data'] ?? [] );
+			$error         = is_wp_error( $result ) ? $result->get_error_message() : null;
+			include __DIR__ . '/views/tab-messages.php';
 			return;
 		}
 

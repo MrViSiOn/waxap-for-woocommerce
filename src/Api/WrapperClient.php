@@ -235,6 +235,76 @@ final class WrapperClient {
 	}
 
 	/**
+	 * Lista las conversaciones WhatsApp de la bandeja de entrada del tenant.
+	 *
+	 * @param int $limit  Número máximo de conversaciones a devolver.
+	 * @param int $offset Desplazamiento para paginación.
+	 * @return array{data: array<int,array<string,mixed>>, total: int, limit: int, offset: int}|WP_Error
+	 */
+	public function get_inbox_conversations( int $limit = 20, int $offset = 0 ): array|WP_Error {
+		return $this->request(
+			'GET',
+			'/v1/inbox/conversations',
+			query: [
+				'limit'  => (string) $limit,
+				'offset' => (string) $offset,
+			],
+			auth: true
+		);
+	}
+
+	/**
+	 * Devuelve el hilo de mensajes con un número de teléfono.
+	 *
+	 * @param string $phone  Número de teléfono sin prefijo + (solo dígitos).
+	 * @param int    $limit  Número máximo de mensajes a devolver.
+	 * @param int    $offset Desplazamiento para paginación.
+	 * @return array{data: array<int,array<string,mixed>>, total: int, limit: int, offset: int}|WP_Error
+	 */
+	public function get_inbox_thread( string $phone, int $limit = 50, int $offset = 0 ): array|WP_Error {
+		return $this->request(
+			'GET',
+			'/v1/inbox/conversations/' . rawurlencode( $phone ) . '/messages',
+			query: [
+				'limit'  => (string) $limit,
+				'offset' => (string) $offset,
+			],
+			auth: true
+		);
+	}
+
+	/**
+	 * Envía un mensaje WhatsApp desde la bandeja de entrada.
+	 *
+	 * @param string $phone Número de teléfono destino (solo dígitos).
+	 * @param string $text  Texto del mensaje.
+	 * @return array<string,mixed>|WP_Error
+	 */
+	public function send_inbox_message( string $phone, string $text ): array|WP_Error {
+		return $this->request(
+			'POST',
+			'/v1/inbox/conversations/' . rawurlencode( $phone ) . '/send',
+			[ 'text' => $text ],
+			auth: true
+		);
+	}
+
+	/**
+	 * Marca una conversación como leída (resetea unreadCount).
+	 *
+	 * @param string $phone Número de teléfono de la conversación.
+	 * @return true|WP_Error
+	 */
+	public function mark_inbox_read( string $phone ): true|WP_Error {
+		$result = $this->request(
+			'POST',
+			'/v1/inbox/conversations/' . rawurlencode( $phone ) . '/read',
+			auth: true
+		);
+		return is_wp_error( $result ) ? $result : true;
+	}
+
+	/**
 	 * Envía un evento de cambio de estado de pedido al wrapper, firmado con HMAC.
 	 *
 	 * @param array<string,mixed> $payload Datos del evento a enviar.

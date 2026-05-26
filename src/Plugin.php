@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use WaNotifier\Admin\AdminMenu;
 use WaNotifier\Admin\Onboarding;
+use WaNotifier\Ajax\InboxAjax;
 use WaNotifier\Ajax\SessionAjax;
 use WaNotifier\Api\WrapperClient;
 use WaNotifier\Checkout\CheckoutOptIn;
@@ -48,6 +49,9 @@ final class Plugin {
 
 		$ajax = new SessionAjax();
 		$ajax->register();
+
+		$inbox_ajax = new InboxAjax();
+		$inbox_ajax->register();
 
 		add_action(
 			'wp_ajax_wa_notifier_billing_portal',
@@ -146,6 +150,27 @@ final class Plugin {
 				'sessionId'     => Settings::get( 'session_id' ),
 			],
 		);
+
+		// Inbox de mensajes (solo en la pestaña Mensajes con cuenta conectada).
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( (string) $_GET['tab'] ) : 'connection';
+		if ( 'messages' === $current_tab && Settings::is_connected() ) {
+			wp_enqueue_script(
+				'wa-notifier-inbox',
+				WA_NOTIFIER_URL . 'assets/js/admin-inbox.js',
+				[ 'jquery' ],
+				$ver,
+				true,
+			);
+			wp_localize_script(
+				'wa-notifier-inbox',
+				'waxapInbox',
+				[
+					'nonce'   => wp_create_nonce( 'wa_notifier_ajax' ),
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				]
+			);
+		}
 
 		// Wizard de onboarding (solo cuando no está conectado).
 		if ( ! Settings::is_connected() ) {
