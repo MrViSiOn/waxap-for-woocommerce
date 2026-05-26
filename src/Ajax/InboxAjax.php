@@ -31,7 +31,7 @@ final class InboxAjax {
 
 	/** Devuelve la lista de conversaciones actualizada (usada por el polling). */
 	public function get_conversations(): void {
-		check_ajax_referer( 'wa_notifier_ajax' );
+		check_ajax_referer( 'wa_notifier_ajax', 'nonce' );
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_send_json_error( 'No autorizado.', 403 );
 		}
@@ -44,7 +44,7 @@ final class InboxAjax {
 
 	/** Devuelve el hilo de mensajes con un número de teléfono. */
 	public function get_thread(): void {
-		check_ajax_referer( 'wa_notifier_ajax' );
+		check_ajax_referer( 'wa_notifier_ajax', 'nonce' );
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_send_json_error( 'No autorizado.', 403 );
 		}
@@ -62,7 +62,7 @@ final class InboxAjax {
 
 	/** Envía un mensaje WhatsApp. */
 	public function send_message(): void {
-		check_ajax_referer( 'wa_notifier_ajax' );
+		check_ajax_referer( 'wa_notifier_ajax', 'nonce' );
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_send_json_error( 'No autorizado.', 403 );
 		}
@@ -81,7 +81,7 @@ final class InboxAjax {
 
 	/** Marca una conversación como leída. */
 	public function mark_read(): void {
-		check_ajax_referer( 'wa_notifier_ajax' );
+		check_ajax_referer( 'wa_notifier_ajax', 'nonce' );
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_send_json_error( 'No autorizado.', 403 );
 		}
