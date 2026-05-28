@@ -71,11 +71,25 @@ final class WrapperClient {
 	/**
 	 * Crea una sesión en el wrapper y la arranca.
 	 *
-	 * @param string $name Nombre identificador de la sesión.
+	 * @param string $name      Nombre identificador de la sesión.
+	 * @param string $store_url URL base de la tienda WooCommerce (plan Agency).
 	 * @return array{id:string,status:string,...}|WP_Error
 	 */
-	public function create_session( string $name ): array|WP_Error {
-		return $this->request( 'POST', '/v1/sessions', [ 'name' => $name ], auth: true );
+	public function create_session( string $name, string $store_url = '' ): array|WP_Error {
+		$body = [ 'name' => $name ];
+		if ( $store_url ) {
+			$body['storeUrl'] = $store_url;
+		}
+		return $this->request( 'POST', '/v1/sessions', $body, auth: true );
+	}
+
+	/**
+	 * Lista todas las sesiones del tenant.
+	 *
+	 * @return array<int,array<string,mixed>>|WP_Error
+	 */
+	public function get_sessions(): array|WP_Error {
+		return $this->request( 'GET', '/v1/sessions', auth: true );
 	}
 
 	/**

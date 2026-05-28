@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use WaNotifier\Api\WrapperClient;
 use WaNotifier\Settings;
 
 /**
@@ -136,6 +137,8 @@ final class SessionPage {
 		</p>
 		<p id="wa-notifier-link-error" class="wan-inline-notice wan-inline-notice--error" style="display:none;margin-top:8px;"></p>
 
+		<?php $this->render_sessions_list(); ?>
+
 		<div id="wa-notifier-test-wrap" style="display:none;">
 			<div class="wan-template-section-header waxap-section-header">
 				<h2><?php esc_html_e( 'Mensaje de prueba', 'waxap-for-woocommerce' ); ?></h2>
@@ -164,6 +167,100 @@ final class SessionPage {
 			</form>
 			<p id="wa-notifier-test-result" class="wan-inline-notice" style="display:none;margin-top:8px;"></p>
 		</div>
+		<?php
+	}
+
+	/** Renderiza la lista de todas las sesiones del tenant con opción de desvincular. */
+	private function render_sessions_list(): void {
+		$client   = new WrapperClient();
+		$sessions = $client->get_sessions();
+
+		if ( is_wp_error( $sessions ) || empty( $sessions ) ) {
+			return;
+		}
+
+		$status_labels = [
+			'ready'          => [ 'label' => __( 'Conectado', 'waxap-for-woocommerce' ), 'color' => '#065f46', 'bg' => '#d1fae5' ],
+			'qr_ready'       => [ 'label' => __( 'Esperando QR', 'waxap-for-woocommerce' ), 'color' => '#92400e', 'bg' => '#fef3c7' ],
+			'initializing'   => [ 'label' => __( 'Iniciando', 'waxap-for-woocommerce' ), 'color' => '#92400e', 'bg' => '#fef3c7' ],
+			'authenticating' => [ 'label' => __( 'Autenticando', 'waxap-for-woocommerce' ), 'color' => '#92400e', 'bg' => '#fef3c7' ],
+			'disconnected'   => [ 'label' => __( 'Desconectado', 'waxap-for-woocommerce' ), 'color' => '#991b1b', 'bg' => '#fee2e2' ],
+			'failed'         => [ 'label' => __( 'Error', 'waxap-for-woocommerce' ), 'color' => '#991b1b', 'bg' => '#fee2e2' ],
+		];
+		?>
+		<div style="margin-top:28px;">
+			<h3 style="font-size:14px;font-weight:600;margin-bottom:12px;color:#1f2937;">
+				<?php esc_html_e( 'Sesiones WhatsApp', 'waxap-for-woocommerce' ); ?>
+			</h3>
+			<div style="display:flex;flex-direction:column;gap:10px;max-width:620px;" id="wan-sessions-list">
+			<?php foreach ( $sessions as $session ) :
+				$sid         = (string) ( $session['id'] ?? '' );
+				$phone       = (string) ( $session['phoneNumber'] ?? '' );
+				$status_key  = (string) ( $session['status'] ?? 'disconnected' );
+				$store_url   = (string) ( $session['storeUrl'] ?? '' );
+				$badge       = $status_labels[ $status_key ] ?? [ 'label' => esc_html( $status_key ), 'color' => '#374151', 'bg' => '#e5e7eb' ];
+				$phone_label = $phone ? '+' . ltrim( $phone, '+' ) : '—';
+				$store_label = $store_url ? wp_parse_url( $store_url, PHP_URL_HOST ) : '—';
+				if ( ! $sid ) continue;
+				?>
+				<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;" data-session-id="<?php echo esc_attr( $sid ); ?>">
+					<div style="display:flex;flex-direction:column;gap:3px;">
+						<span style="font-size:13px;font-weight:600;color:#111827;"><?php echo esc_html( $phone_label ); ?></span>
+						<?php if ( $store_label && '—' !== $store_label ) : ?>
+						<span style="font-size:11px;color:#6b7280;"><?php echo esc_html( $store_label ); ?></span>
+						<?php endif; ?>
+					</div>
+					<div style="display:flex;align-items:center;gap:10px;">
+						<span style="background:<?php echo esc_attr( $badge['bg'] ); ?>;color:<?php echo esc_attr( $badge['color'] ); ?>;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;">
+							<?php echo esc_html( $badge['label'] ); ?>
+						</span>
+						<button type="button"
+								class="button wan-delete-session-btn"
+								data-session-id="<?php echo esc_attr( $sid ); ?>"
+								data-nonce="<?php echo esc_attr( wp_create_nonce( 'wa_notifier_ajax' ) ); ?>"
+								style="padding:2px 10px;font-size:12px;color:#dc2626;border-color:#fca5a5;">
+							<?php esc_html_e( 'Desvincular', 'waxap-for-woocommerce' ); ?>
+						</button>
+					</div>
+				</div>
+			<?php endforeach; ?>
+			</div>
+		</div>
+
+		<script>
+		(function () {
+			document.querySelectorAll('.wan-delete-session-btn').forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					if ( ! confirm('<?php echo esc_js( __( '¿Desvincular esta sesión? Se cerrará la conexión WhatsApp de este número.', 'waxap-for-woocommerce' ) ); ?>') ) return;
+					var sid   = btn.getAttribute('data-session-id');
+					var nonce = btn.getAttribute('data-nonce');
+					btn.disabled = true;
+					btn.textContent = '<?php echo esc_js( __( 'Eliminando…', 'waxap-for-woocommerce' ) ); ?>';
+					fetch(ajaxurl, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+						body: new URLSearchParams({ action: 'wa_notifier_delete_session', nonce: nonce, session_id: sid })
+					})
+					.then(function (r) { return r.json(); })
+					.then(function (data) {
+						if (data.success) {
+							var row = document.querySelector('[data-session-id="' + sid + '"]');
+							if (row) row.remove();
+						} else {
+							alert(data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Error al desvincular.', 'waxap-for-woocommerce' ) ); ?>');
+							btn.disabled = false;
+							btn.textContent = '<?php echo esc_js( __( 'Desvincular', 'waxap-for-woocommerce' ) ); ?>';
+						}
+					})
+					.catch(function () {
+						alert('<?php echo esc_js( __( 'Error de conexión.', 'waxap-for-woocommerce' ) ); ?>');
+						btn.disabled = false;
+						btn.textContent = '<?php echo esc_js( __( 'Desvincular', 'waxap-for-woocommerce' ) ); ?>';
+					});
+				});
+			});
+		})();
+		</script>
 		<?php
 	}
 

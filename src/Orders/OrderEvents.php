@@ -69,6 +69,7 @@ final class OrderEvents {
 			'customerPhone' => $phone,
 			'customerName'  => $name,
 			'whatsappOptIn' => $opt_in,
+			'siteUrl'       => home_url(),
 		];
 
 		$message = $this->resolve_template( $order, $to_status );

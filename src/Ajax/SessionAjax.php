@@ -24,7 +24,7 @@ final class SessionAjax {
 
 	/** Registra los hooks AJAX del plugin. */
 	public function register(): void {
-		foreach ( [ 'register', 'create_session', 'poll_session', 'disconnect', 'send_test' ] as $action ) {
+		foreach ( [ 'register', 'create_session', 'poll_session', 'disconnect', 'send_test', 'delete_session' ] as $action ) {
 			add_action( "wp_ajax_wa_notifier_{$action}", [ $this, "handle_{$action}" ] );
 		}
 	}
@@ -66,7 +66,7 @@ final class SessionAjax {
 		if ( ! $site_name ) {
 			$site_name = 'tienda';
 		}
-		$session = $client->create_session( $site_name );
+		$session = $client->create_session( $site_name, home_url() );
 
 		if ( is_wp_error( $session ) ) {
 			wp_send_json_error( [ 'message' => $session->get_error_message() ] );
@@ -161,6 +161,30 @@ final class SessionAjax {
 		}
 
 		wp_send_json_success( [ 'messageId' => $result['messageId'] ?? '' ] );
+	}
+
+	/** Elimina una sesión concreta (por ID) del wrapper. */
+	public function handle_delete_session(): void {
+		$this->verify_nonce();
+
+		$session_id = sanitize_text_field( wp_unslash( (string) ( $_POST['session_id'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! $session_id ) {
+			wp_send_json_error( [ 'message' => __( 'ID de sesión requerido.', 'waxap-for-woocommerce' ) ] );
+		}
+
+		$client = new WrapperClient();
+		$result = $client->delete_session( $session_id );
+
+		if ( Settings::get( 'session_id' ) === $session_id ) {
+			Settings::delete( 'session_id' );
+			Settings::delete( 'phone_number' );
+		}
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
+
+		wp_send_json_success();
 	}
 
 	/** Verifica el nonce AJAX antes de procesar cualquier petición. */
