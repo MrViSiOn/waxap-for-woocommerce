@@ -175,7 +175,7 @@ final class SessionPage {
 		$client   = new WrapperClient();
 		$sessions = $client->get_sessions();
 
-		if ( is_wp_error( $sessions ) || empty( $sessions ) ) {
+		if ( is_wp_error( $sessions ) || count( $sessions ) < 2 ) {
 			return;
 		}
 
