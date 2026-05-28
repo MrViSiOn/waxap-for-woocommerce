@@ -222,5 +222,18 @@ final class Plugin {
 		);
 		// Descargar el zip adjunto al GitHub Release en lugar del zip de fuentes.
 		$checker->getVcsApi()->enableReleaseAssets();
+
+		add_filter(
+			'puc_request_info_result-waxap-for-woocommerce',
+			static function ( $info ) {
+				if ( $info ) {
+					$info->icons = [
+						'1x' => 'https://waxap.shop/favicon.png',
+						'2x' => 'https://waxap.shop/favicon.png',
+					];
+				}
+				return $info;
+			}
+		);
 	}
 }
