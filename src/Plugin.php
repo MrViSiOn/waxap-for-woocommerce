@@ -72,9 +72,12 @@ final class Plugin {
 		$onboarding = new Onboarding();
 		$onboarding->register();
 
-		$init_wc_components = function () {
+		$order_emails = new OrderEmails();
+		$order_emails->register_shortcode();
+
+		$init_wc_components = function () use ( $order_emails ) {
 			( new OrderEvents() )->register();
-			( new OrderEmails() )->register();
+			$order_emails->register();
 			( new CheckoutOptIn() )->register();
 		};
 

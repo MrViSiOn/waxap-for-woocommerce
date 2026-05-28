@@ -124,6 +124,39 @@ if ( isset( $_GET['updated'] ) ) : ?>
 	</p>
 </form>
 
+<hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0;">
+
+<div class="waxap-section-header">
+	<h2><?php esc_html_e( 'Usar el botón en otras páginas', 'waxap-for-woocommerce' ); ?></h2>
+	<p><?php esc_html_e( 'Puedes insertar el mismo botón en cualquier página o entrada de WordPress usando el shortcode:', 'waxap-for-woocommerce' ); ?></p>
+</div>
+
+<div style="max-width:620px;">
+	<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:16px 20px;margin-bottom:16px;">
+		<code style="font-size:13px;font-family:'Courier New',monospace;color:#1e293b;">[waxap_whatsapp_button]</code>
+	</div>
+	<p style="margin:0 0 8px;color:#6b7280;font-size:13px;">
+		<?php esc_html_e( 'Utiliza el texto y el mensaje prefabricado configurados en el formulario de arriba.', 'waxap-for-woocommerce' ); ?>
+	</p>
+	<p style="margin:0 0 16px;color:#6b7280;font-size:13px;">
+		<?php esc_html_e( 'Si usas el shortcode en una página de confirmación de pedido y quieres incluir el número de pedido en el mensaje, añade el atributo order:', 'waxap-for-woocommerce' ); ?>
+	</p>
+	<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:16px 20px;margin-bottom:16px;">
+		<code style="font-size:13px;font-family:'Courier New',monospace;color:#1e293b;">[waxap_whatsapp_button order="1234"]</code>
+	</div>
+	<p style="margin:0;color:#6b7280;font-size:13px;">
+		<?php
+		echo wp_kses(
+			/* translators: %s: ejemplo de variable {pedido} */
+			sprintf(
+				__( 'El valor de <code>order</code> sustituirá la variable <code>{pedido}</code> que hayas puesto en el mensaje prefabricado.', 'waxap-for-woocommerce' )
+			),
+			[ 'code' => [] ]
+		);
+		?>
+	</p>
+</div>
+
 <script>
 (function () {
 	var textInput  = document.getElementById('wan-email-text');
