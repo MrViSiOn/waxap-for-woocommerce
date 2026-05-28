@@ -3,7 +3,7 @@
  * Plugin Name:       Waxap for WooCommerce
  * Plugin URI:        https://wanotifier.example
  * Description:       Send transactional WhatsApp notifications to your WooCommerce customers. Bring your own number, scan a QR, done.
- * Version:           0.3.6
+ * Version:           0.4.0
  * Requires at least: 6.2
  * Requires PHP:      8.1
  * Author:            drappsinfo

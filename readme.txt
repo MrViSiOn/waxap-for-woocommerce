@@ -4,7 +4,7 @@ Tags: woocommerce, whatsapp, notifications, order-status, transactional-messagin
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.3.3
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,11 @@ The plugin is free. The SaaS service has a free 14-day trial and paid plans from
 The plugin sends order metadata (order ID, status) and customer phone numbers to the Waxap SaaS service (api.waxap.shop). Customer phone numbers are only transmitted when the customer has opted in via the checkout consent checkbox.
 
 == Changelog ==
+
+= 0.4.0 =
+* New: Agency plan support — one API key can power multiple WooCommerce stores, each with its own WhatsApp number.
+* New: Sessions management UI — accounts with 2+ sessions see a list with status badges and per-session disconnect.
+* New: Plugin sends site_url on session creation and order events for automatic store-to-session routing.
 
 = 0.3.3 =
 * Fix: Modal de QR no se abría al volver a la pestaña "Número WhatsApp" con sesión en estado intermedio — el body quedaba con overflow:hidden bloqueado.
