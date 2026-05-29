@@ -30,6 +30,7 @@ final class Settings {
 		'wrapper_url'          => 'https://api.waxap.shop',
 		'api_key'              => '',
 		'tenant_id'            => '',
+		'claim_token'          => '',
 		'session_id'           => '',
 		'hmac_secret'          => '',
 		'phone_number'         => '',
@@ -122,7 +123,7 @@ final class Settings {
 
 	/** Elimina todas las credenciales del plugin (desconexión completa). */
 	public static function disconnect(): void {
-		foreach ( [ 'api_key', 'tenant_id', 'session_id', 'hmac_secret', 'phone_number' ] as $key ) {
+		foreach ( [ 'api_key', 'tenant_id', 'claim_token', 'session_id', 'hmac_secret', 'phone_number' ] as $key ) {
 			self::set( $key, '' );
 		}
 	}

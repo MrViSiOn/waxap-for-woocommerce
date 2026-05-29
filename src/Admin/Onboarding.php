@@ -47,12 +47,14 @@ final class Onboarding {
 			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
 		}
 
-		$tenant_id = (string) ( $result['tenantId'] ?? '' );
+		$tenant_id   = (string) ( $result['tenantId'] ?? '' );
+		$claim_token = (string) ( $result['claimToken'] ?? '' );
 		if ( ! $tenant_id ) {
 			wp_send_json_error( [ 'message' => 'El servidor no devolvió un identificador de cuenta.' ] );
 		}
 
 		Settings::set( 'tenant_id', $tenant_id );
+		Settings::set( 'claim_token', $claim_token );
 
 		wp_send_json_success( [ 'tenantId' => $tenant_id ] );
 	}
@@ -110,8 +112,16 @@ final class Onboarding {
 		$status = (string) ( $result['status'] ?? 'pending_payment' );
 
 		if ( 'active' === $status ) {
-			Settings::set( 'api_key', (string) ( $result['apiKey'] ?? '' ) );
-			Settings::set( 'hmac_secret', (string) ( $result['hmacSecret'] ?? '' ) );
+			$claim_token = Settings::get( 'claim_token' );
+			if ( $claim_token ) {
+				$credentials = $client->claim_credentials( $tenant_id, $claim_token );
+				if ( is_wp_error( $credentials ) ) {
+					wp_send_json_error( [ 'message' => $credentials->get_error_message() ] );
+				}
+				Settings::set( 'api_key', (string) ( $credentials['apiKey'] ?? '' ) );
+				Settings::set( 'hmac_secret', (string) ( $credentials['hmacSecret'] ?? '' ) );
+				Settings::set( 'claim_token', '' );
+			}
 		}
 
 		wp_send_json_success( [ 'status' => $status ] );

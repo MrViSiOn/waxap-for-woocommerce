@@ -51,11 +51,11 @@ final class WrapperClient {
 	}
 
 	/**
-	 * Registra la tienda y devuelve apiKey + tenantId.
+	 * Registra la tienda y devuelve tenantId + claimToken de un solo uso.
 	 *
 	 * @param string $email    Email del administrador de la tienda.
 	 * @param string $password Contraseña de la cuenta.
-	 * @return array{apiKey:string,tenantId:string}|WP_Error
+	 * @return array{tenantId:string,claimToken:string}|WP_Error
 	 */
 	public function register( string $email, string $password ): array|WP_Error {
 		return $this->request(
@@ -140,10 +140,31 @@ final class WrapperClient {
 	}
 
 	/**
+	 * Canjea el claim token de un solo uso para obtener las credenciales del tenant.
+	 *
+	 * Solo funciona una vez: el wrapper marca el token como consumido en la primera
+	 * llamada exitosa. Reintentos posteriores reciben 401.
+	 *
+	 * @param string $tenant_id   ID del tenant.
+	 * @param string $claim_token Token de reclamación emitido por register().
+	 * @return array{apiKey:string,hmacSecret:string}|WP_Error
+	 */
+	public function claim_credentials( string $tenant_id, string $claim_token ): array|WP_Error {
+		return $this->request(
+			'POST',
+			'/v1/auth/claim',
+			[
+				'tenantId'   => $tenant_id,
+				'claimToken' => $claim_token,
+			]
+		);
+	}
+
+	/**
 	 * Consulta el estado de activación de un tenant (polling post-pago Stripe).
 	 *
 	 * @param string $tenant_id ID del tenant a consultar.
-	 * @return array{status:string,apiKey?:string,hmacSecret?:string}|WP_Error
+	 * @return array{status:string}|WP_Error
 	 */
 	public function get_auth_status( string $tenant_id ): array|WP_Error {
 		return $this->request( 'GET', "/v1/auth/status/{$tenant_id}" );
