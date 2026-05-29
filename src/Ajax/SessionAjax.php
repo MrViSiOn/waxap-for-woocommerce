@@ -187,10 +187,13 @@ final class SessionAjax {
 		wp_send_json_success();
 	}
 
-	/** Verifica el nonce AJAX antes de procesar cualquier petición. */
+	/** Verifica el nonce y los permisos del usuario antes de procesar cualquier petición. */
 	private function verify_nonce(): void {
 		if ( ! check_ajax_referer( 'wa_notifier_ajax', 'nonce', false ) ) {
-			wp_send_json_error( [ 'message' => 'Nonce inválido.' ], 403 );
+			wp_send_json_error( [ 'message' => 'Sesión expirada. Recarga la página.' ], 403 );
+		}
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error( [ 'message' => 'No autorizado.' ], 403 );
 		}
 	}
 }
