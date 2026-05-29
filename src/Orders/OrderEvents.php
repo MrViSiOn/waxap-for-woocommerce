@@ -83,7 +83,17 @@ final class OrderEvents {
 			$payload['lastInboundAt'] = $last_inbound;
 		}
 
-		( new WrapperClient() )->send_event( $payload );
+		// Defensa cliente: no reenviar si ya notificamos este estado para este pedido.
+		$sent_meta = '_waxap_notified_' . $to_status;
+		if ( $order->get_meta( $sent_meta, true ) ) {
+			return;
+		}
+
+		$result = ( new WrapperClient() )->send_event( $payload );
+		if ( ! is_wp_error( $result ) ) {
+			$order->update_meta_data( $sent_meta, '1' );
+			$order->save();
+		}
 	}
 
 	/**
