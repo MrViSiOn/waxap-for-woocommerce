@@ -7,7 +7,6 @@
         POLL_INTERVAL_MS: 2500,
 
         init: function () {
-            $('#wa-notifier-register-form').on('submit', this.onRegister.bind(this));
             $(document).on('click', '#wa-notifier-link-btn', this.onLinkClick.bind(this));
             $(document).on('click', '#wa-notifier-unlink-btn', this.onUnlink.bind(this));
             $(document).on('click', '#wa-notifier-modal-close, #wa-notifier-modal-overlay', this.onModalClose.bind(this));
@@ -22,35 +21,6 @@
             if (waNotifierData.hasSession === '1' && $('#wa-notifier-modal').length) {
                 this.refreshStatus();
             }
-        },
-
-        /* ---- Registration ---- */
-
-        onRegister: function (e) {
-            e.preventDefault();
-            var $form = $(e.target);
-            this.setLoading($form, true);
-            this.clearError('#wa-notifier-register-error');
-
-            $.post(waNotifierData.ajaxUrl, {
-                action:      'wa_notifier_register',
-                nonce:       waNotifierData.nonce,
-                wrapper_url: $form.find('[name=wrapper_url]').val(),
-                email:       $form.find('[name=email]').val(),
-                password:    $form.find('[name=password]').val(),
-            })
-            .done(function (res) {
-                if (res.success) {
-                    location.reload();
-                } else {
-                    WAN.showError('#wa-notifier-register-error', res.data.message);
-                    WAN.setLoading($form, false);
-                }
-            })
-            .fail(function () {
-                WAN.showError('#wa-notifier-register-error', 'Error de red. Comprueba que el servidor está accesible.');
-                WAN.setLoading($form, false);
-            });
         },
 
         /* ---- Session linking ---- */
@@ -135,11 +105,14 @@
                     $('#wa-notifier-qr-loading').hide();
                 }
 
-                // Handle terminal states
+                // Handle terminal states. Solo 'failed' es terminal: el motor agotó
+                // los reintentos. 'disconnected' es TRANSITORIO (durante la
+                // vinculación el motor se reconecta solo, p.ej. el restart 515 tras
+                // escanear el QR), así que seguimos sondeando en vez de declarar fallo.
                 if (data.status === 'ready') {
                     WAN.stopPolling();
                     WAN.onAuthenticated(data.phone);
-                } else if (data.status === 'failed' || data.status === 'disconnected') {
+                } else if (data.status === 'failed') {
                     WAN.stopPolling();
                     WAN.showError('#wa-notifier-modal-error', 'La sesión falló. Inténtalo de nuevo.');
                 }
