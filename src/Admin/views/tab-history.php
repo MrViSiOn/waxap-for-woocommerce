@@ -81,11 +81,31 @@ $waxap_skip_text = static function ( string $reason, array $labels ): string {
 
 		/* Tarjetas de resumen: estado → etiqueta + clase de color. */
 		$waxap_cards = [
-			[ 'count' => (int) ( $waxap_totals['sent'] ?? 0 ),    'label' => __( 'Enviados', 'waxap-for-woocommerce' ),         'class' => 'waxap-stat--sent' ],
-			[ 'count' => (int) ( $waxap_totals['failed'] ?? 0 ),  'label' => __( 'Fallidos', 'waxap-for-woocommerce' ),         'class' => 'waxap-stat--failed' ],
-			[ 'count' => (int) ( $waxap_skips['no_opt_in'] ?? 0 ), 'label' => __( 'Sin opt-in', 'waxap-for-woocommerce' ),       'class' => 'waxap-stat--skip' ],
-			[ 'count' => $waxap_quota_n,                           'label' => __( 'Cuota agotada', 'waxap-for-woocommerce' ),    'class' => 'waxap-stat--skip' ],
-			[ 'count' => (int) ( $waxap_skips['no_template'] ?? 0 ), 'label' => __( 'Sin plantilla', 'waxap-for-woocommerce' ),   'class' => 'waxap-stat--skip' ],
+			[
+				'count' => (int) ( $waxap_totals['sent'] ?? 0 ),
+				'label' => __( 'Enviados', 'waxap-for-woocommerce' ),
+				'class' => 'waxap-stat--sent',
+			],
+			[
+				'count' => (int) ( $waxap_totals['failed'] ?? 0 ),
+				'label' => __( 'Fallidos', 'waxap-for-woocommerce' ),
+				'class' => 'waxap-stat--failed',
+			],
+			[
+				'count' => (int) ( $waxap_skips['no_opt_in'] ?? 0 ),
+				'label' => __( 'Sin opt-in', 'waxap-for-woocommerce' ),
+				'class' => 'waxap-stat--skip',
+			],
+			[
+				'count' => $waxap_quota_n,
+				'label' => __( 'Cuota agotada', 'waxap-for-woocommerce' ),
+				'class' => 'waxap-stat--skip',
+			],
+			[
+				'count' => (int) ( $waxap_skips['no_template'] ?? 0 ),
+				'label' => __( 'Sin plantilla', 'waxap-for-woocommerce' ),
+				'class' => 'waxap-stat--skip',
+			],
 		];
 		?>
 		<div class="waxap-stats">

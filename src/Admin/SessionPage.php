@@ -136,12 +136,36 @@ final class SessionPage {
 		}
 
 		$status_labels = [
-			'ready'          => [ 'label' => __( 'Conectado', 'waxap-for-woocommerce' ), 'color' => '#065f46', 'bg' => '#d1fae5' ],
-			'qr_ready'       => [ 'label' => __( 'Esperando QR', 'waxap-for-woocommerce' ), 'color' => '#92400e', 'bg' => '#fef3c7' ],
-			'initializing'   => [ 'label' => __( 'Iniciando', 'waxap-for-woocommerce' ), 'color' => '#92400e', 'bg' => '#fef3c7' ],
-			'authenticating' => [ 'label' => __( 'Autenticando', 'waxap-for-woocommerce' ), 'color' => '#92400e', 'bg' => '#fef3c7' ],
-			'disconnected'   => [ 'label' => __( 'Desconectado', 'waxap-for-woocommerce' ), 'color' => '#991b1b', 'bg' => '#fee2e2' ],
-			'failed'         => [ 'label' => __( 'Error', 'waxap-for-woocommerce' ), 'color' => '#991b1b', 'bg' => '#fee2e2' ],
+			'ready'          => [
+				'label' => __( 'Conectado', 'waxap-for-woocommerce' ),
+				'color' => '#065f46',
+				'bg'    => '#d1fae5',
+			],
+			'qr_ready'       => [
+				'label' => __( 'Esperando QR', 'waxap-for-woocommerce' ),
+				'color' => '#92400e',
+				'bg'    => '#fef3c7',
+			],
+			'initializing'   => [
+				'label' => __( 'Iniciando', 'waxap-for-woocommerce' ),
+				'color' => '#92400e',
+				'bg'    => '#fef3c7',
+			],
+			'authenticating' => [
+				'label' => __( 'Autenticando', 'waxap-for-woocommerce' ),
+				'color' => '#92400e',
+				'bg'    => '#fef3c7',
+			],
+			'disconnected'   => [
+				'label' => __( 'Desconectado', 'waxap-for-woocommerce' ),
+				'color' => '#991b1b',
+				'bg'    => '#fee2e2',
+			],
+			'failed'         => [
+				'label' => __( 'Error', 'waxap-for-woocommerce' ),
+				'color' => '#991b1b',
+				'bg'    => '#fee2e2',
+			],
 		];
 		?>
 		<div style="margin-top:28px;">
@@ -149,15 +173,22 @@ final class SessionPage {
 				<?php esc_html_e( 'Sesiones WhatsApp', 'waxap-for-woocommerce' ); ?>
 			</h3>
 			<div style="display:flex;flex-direction:column;gap:10px;max-width:620px;" id="wan-sessions-list">
-			<?php foreach ( $sessions as $session ) :
+			<?php
+			foreach ( $sessions as $session ) :
 				$sid         = (string) ( $session['id'] ?? '' );
 				$phone       = (string) ( $session['phoneNumber'] ?? '' );
 				$status_key  = (string) ( $session['status'] ?? 'disconnected' );
 				$store_url   = (string) ( $session['storeUrl'] ?? '' );
-				$badge       = $status_labels[ $status_key ] ?? [ 'label' => esc_html( $status_key ), 'color' => '#374151', 'bg' => '#e5e7eb' ];
+				$badge       = $status_labels[ $status_key ] ?? [
+					'label' => esc_html( $status_key ),
+					'color' => '#374151',
+					'bg'    => '#e5e7eb',
+				];
 				$phone_label = $phone ? '+' . ltrim( $phone, '+' ) : '—';
 				$store_label = $store_url ? wp_parse_url( $store_url, PHP_URL_HOST ) : '—';
-				if ( ! $sid ) continue;
+				if ( ! $sid ) {
+					continue;
+				}
 				?>
 				<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;" data-session-id="<?php echo esc_attr( $sid ); ?>">
 					<div style="display:flex;flex-direction:column;gap:3px;">

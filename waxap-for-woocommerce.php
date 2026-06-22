@@ -59,7 +59,10 @@ add_action(
 								__( '<strong>Waxap</strong> requiere %s para funcionar. Por favor, instala y activa WooCommerce primero.', 'waxap-for-woocommerce' ),
 								'<a href="https://wordpress.org/plugins/woocommerce/">WooCommerce</a>'
 							),
-							[ 'strong' => [], 'a' => [ 'href' => [] ] ]
+							[
+								'strong' => [],
+								'a'      => [ 'href' => [] ],
+							]
 						)
 						. '</p></div>';
 				}
