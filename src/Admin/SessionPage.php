@@ -22,66 +22,22 @@ use WaNotifier\Settings;
  */
 final class SessionPage {
 
-	/** Renderiza el contenido de la pestaña según el estado actual de conexión. */
+	/**
+	 * Renderiza el contenido de la pestaña según el estado actual de conexión.
+	 *
+	 * Esta pestaña ("Número WhatsApp") solo es accesible cuando el tenant ya está
+	 * conectado: AdminMenu::render_tab() redirige a la pestaña "Conexión" (donde vive
+	 * el onboarding y el login) si Settings::is_connected() es false. Por eso aquí
+	 * solo distinguimos entre "sin sesión vinculada" y "sesión vinculada".
+	 */
 	public function render(): void {
-		if ( ! Settings::is_connected() ) {
-			$this->render_register_form();
-		} elseif ( ! Settings::has_session() ) {
+		if ( ! Settings::has_session() ) {
 			$this->render_link_button();
 		} else {
 			$this->render_session_status();
 		}
 
 		$this->render_modal();
-	}
-
-	/** Muestra el formulario de registro/credenciales cuando no hay conexión al wrapper. */
-	private function render_register_form(): void {
-		$wrapper_url = Settings::get( 'wrapper_url' );
-		?>
-		<div class="waxap-section-header">
-			<h2><?php esc_html_e( 'Conecta tu número WhatsApp', 'waxap-for-woocommerce' ); ?></h2>
-			<p><?php esc_html_e( 'Introduce tus credenciales de servidor para empezar a enviar notificaciones.', 'waxap-for-woocommerce' ); ?></p>
-		</div>
-
-		<form id="wa-notifier-register-form" method="post" autocomplete="off">
-			<?php wp_nonce_field( 'wa_notifier_register', 'wa_notifier_nonce' ); ?>
-
-			<div class="wan-field-rows" style="max-width:480px;">
-				<div class="wan-field-row">
-					<label for="wan-wrapper-url" class="wan-field-label">
-						<?php esc_html_e( 'URL del servidor', 'waxap-for-woocommerce' ); ?>
-					</label>
-					<input type="url" id="wan-wrapper-url" name="wrapper_url"
-							value="<?php echo esc_attr( $wrapper_url ); ?>"
-							class="regular-text wan-field-input" autocomplete="off" required>
-				</div>
-				<div class="wan-field-row">
-					<label for="wan-email" class="wan-field-label">
-						<?php esc_html_e( 'Email', 'waxap-for-woocommerce' ); ?>
-					</label>
-					<input type="email" id="wan-email" name="email"
-							class="regular-text wan-field-input" required>
-				</div>
-				<div class="wan-field-row">
-					<label for="wan-password" class="wan-field-label">
-						<?php esc_html_e( 'Contraseña', 'waxap-for-woocommerce' ); ?>
-					</label>
-					<input type="password" id="wan-password" name="password"
-							class="regular-text wan-field-input" required minlength="8">
-				</div>
-			</div>
-
-			<p id="wa-notifier-register-error" class="wan-inline-notice wan-inline-notice--error" style="display:none;"></p>
-
-			<p class="wan-action-row">
-				<button type="submit" class="button button-primary waxap-btn-primary" id="wa-notifier-register-btn">
-					<?php esc_html_e( 'Crear cuenta y conectar', 'waxap-for-woocommerce' ); ?>
-				</button>
-				<span class="wa-notifier-spinner spinner" style="float:none;margin:0;"></span>
-			</p>
-		</form>
-		<?php
 	}
 
 	/** Muestra el botón para iniciar el flujo de vinculación QR. */

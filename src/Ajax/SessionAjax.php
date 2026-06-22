@@ -24,37 +24,9 @@ final class SessionAjax {
 
 	/** Registra los hooks AJAX del plugin. */
 	public function register(): void {
-		foreach ( [ 'register', 'create_session', 'poll_session', 'disconnect', 'send_test', 'delete_session' ] as $action ) {
+		foreach ( [ 'create_session', 'poll_session', 'disconnect', 'send_test', 'delete_session' ] as $action ) {
 			add_action( "wp_ajax_wa_notifier_{$action}", [ $this, "handle_{$action}" ] );
 		}
-	}
-
-	/** Procesa el registro de la tienda en el wrapper. */
-	public function handle_register(): void {
-		$this->verify_nonce();
-
-		$wrapper_url = sanitize_url( wp_unslash( (string) ( $_POST['wrapper_url'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$email       = sanitize_email( wp_unslash( (string) ( $_POST['email'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$password    = wp_unslash( (string) ( $_POST['password'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passwords must not be sanitized
-
-		if ( ! $wrapper_url || ! $email || ! $password ) {
-			wp_send_json_error( [ 'message' => __( 'Todos los campos son obligatorios.', 'waxap-for-woocommerce' ) ] );
-		}
-
-		Settings::set( 'wrapper_url', $wrapper_url );
-
-		$client = new WrapperClient();
-		$result = $client->register( $email, $password );
-
-		if ( is_wp_error( $result ) ) {
-			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
-		}
-
-		Settings::set( 'api_key', (string) ( $result['apiKey'] ?? '' ) );
-		Settings::set( 'tenant_id', (string) ( $result['tenantId'] ?? '' ) );
-		Settings::set( 'hmac_secret', (string) ( $result['hmacSecret'] ?? '' ) );
-
-		wp_send_json_success();
 	}
 
 	/** Crea una nueva sesión WhatsApp en el wrapper. */

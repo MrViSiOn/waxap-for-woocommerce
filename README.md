@@ -1,83 +1,71 @@
-# WA Notifier — Plugin WooCommerce
+# Waxap for WooCommerce — Plugin
 
-Plugin de WordPress que conecta WooCommerce con el SaaS WA Notifier para enviar notificaciones transaccionales por WhatsApp.
+Plugin de WordPress que conecta WooCommerce con el SaaS **Waxap** para enviar notificaciones transaccionales por WhatsApp. El comerciante aporta su propio número (lo vincula por QR desde el admin) y los emails de WooCommerce incluyen un botón `wa.me` para que sea el cliente quien inicia la conversación.
 
-> **Este es un repositorio independiente** del monorepo principal (`WaNotifier/`), porque WordPress.org exige una estructura SVN propia para distribución pública.
+> **Repositorio independiente** del monorepo principal (`WaNotifier/`), porque WordPress.org exige licencia GPL y estructura SVN propias para distribución pública. Slug WP.org: `waxap-for-woocommerce`.
 
 ## Estado
 
-🚧 **No implementado todavía.** Esqueleto inicial pendiente de generar en Fase 0.
+✅ **Implementado y en producción.** Versión actual: ver cabecera de `waxap-for-woocommerce.php` (0.4.x).
 
 ## Stack
 
-- **PHP:** 8.1+
+- **PHP:** 8.1+ (`declare(strict_types=1)`, type hints, PSR-12)
 - **WordPress:** 6.2+
-- **WooCommerce:** 8.0+
+- **WooCommerce:** 8.0+ (HPOS)
+- **Autoloader:** Composer PSR-4 (`WaNotifier\` → `src/`)
 - **Licencia:** GPL v2 or later (exigido por WordPress.org)
 
-## Estructura prevista (estándar WordPress)
+## Estructura (`src/`)
 
 ```
-wa-notifier-wp-plugin/
-├── wa-notifier.php             Archivo principal (cabecera del plugin)
-├── readme.txt                  Formato WordPress.org (NO markdown)
-├── README.md                   Para desarrolladores (GitHub)
-├── uninstall.php               Limpieza al desinstalar
-├── composer.json
-├── src/
-│   ├── Plugin.php              Bootstrap principal
-│   ├── Admin/                  Páginas de admin (settings, vinculación QR)
-│   ├── Frontend/               Checkbox opt-in en checkout
-│   ├── Hooks/                  Listeners de eventos WooCommerce
-│   ├── Api/                    Cliente HTTP del wrapper SaaS
-│   ├── Email/                  Inyección del botón wa.me en emails WC
-│   └── WebSocket/              Cliente WebSocket para QR streaming
-├── assets/
-│   ├── js/
-│   │   ├── admin.js            QR rendering + WebSocket
-│   │   └── checkout.js
-│   ├── css/
-│   └── images/
-└── languages/
-    ├── wa-notifier.pot         Template para traducciones
-    ├── wa-notifier-es_ES.po
-    └── wa-notifier-pt_BR.po
+src/
+├── Plugin.php          Bootstrap (registra menú, hooks, ajax, handlers)
+├── Settings.php        Acceso tipado a wp_options (credenciales, plantillas, config)
+├── Admin/              Menú y pestañas (Conexión, Número, Notificaciones,
+│                       Email branding, Historial, Mensajes); onboarding wizard
+├── Ajax/               Handlers WP-AJAX (sesión/QR, inbox)
+├── Api/                WrapperClient: cliente HTTP del wrapper SaaS
+├── Checkout/           Checkbox opt-in WhatsApp (GDPR) en el checkout
+├── Emails/             Inyección del botón wa.me en emails transaccionales de WC
+└── Orders/             Listener de cambios de estado → POST /v1/events (HMAC + idempotente)
 ```
 
-## Hooks WooCommerce que escuchamos
+Assets JS en `assets/js/`: `admin-onboarding.js` (wizard registro→pago→QR), `admin-session.js` (vinculación/estado), `admin-inbox.js` (buzón).
 
-| Hook | Evento |
+## Flujo de onboarding (canónico)
+
+El alta vive en la pestaña **Conexión** (`Admin/Onboarding.php` + `admin-onboarding.js`):
+
+1. Crear cuenta (`POST /v1/auth/register` → devuelve `tenantId` + `claimToken`).
+2. Pagar €5/mes (Stripe Checkout).
+3. Tras la activación, el plugin canjea el `claimToken` (`POST /v1/auth/claim`) para obtener `apiKey` + `hmacSecret` — las credenciales **no** viajan por canales no autenticados.
+4. Vincular el número por QR (pestaña "Número WhatsApp").
+
+> No existe un alta manual por formulario de credenciales: ese flujo legacy se eliminó (DRAPPS-290).
+
+## Hooks de WooCommerce
+
+| Hook | Uso |
 |---|---|
-| `woocommerce_new_order` | order.created |
-| `woocommerce_order_status_pending_to_processing` | order.paid |
-| `woocommerce_order_status_processing_to_completed` | order.completed |
-| `woocommerce_order_status_changed` | order.status_changed |
-| `woocommerce_order_refunded` | order.refunded |
-| `woocommerce_cancelled_order` | order.cancelled |
-
-## Endpoints del wrapper que llamamos
-
-```
-POST  /v1/auth/register             Crear cuenta SaaS desde el plugin
-POST  /v1/auth/login                Login
-POST  /v1/sessions                  Crear sesión + iniciar QR
-GET   /v1/sessions/:id              Estado sesión
-WS    /v1/sessions/:id/qr-stream    QR streaming
-POST  /v1/events                    Enviar eventos WC al wrapper
-```
+| `woocommerce_order_status_changed` | Envía evento al wrapper si el estado está en la lista a notificar y hay opt-in. Idempotente por `_waxap_notified_<status>`. |
+| `woocommerce_email_after_order_table` (branding) | Inyecta el botón `wa.me` en los emails de cliente. |
+| checkout | Checkbox de opt-in → meta `_wa_notifier_opt_in`. |
 
 ## Desarrollo local
 
+Entorno WP + WC + MailHog vía `docker-compose.yml` del propio repo (ver `bin/bootstrap-wp.sh`). El plugin apunta al wrapper en `http://host.docker.internal:3000`. Guía completa en [`../DEV.md`](../DEV.md).
+
 ```bash
-cd wa-notifier-wp-plugin/
 composer install
-# Symlinkar a un wp-content/plugins/ local
-ln -s $PWD /path/to/wordpress/wp-content/plugins/wa-notifier
+# PHPCS (WordPress Coding Standards)
+composer lint        # vendor/bin/phpcs --standard=phpcs.xml.dist
+composer lint:fix    # phpcbf
 ```
 
-## Build y publicación en WordPress.org
+## Publicación en WordPress.org
 
-Pendiente de scripts. Plan: GitHub Action que sincronice `trunk/` y `tags/v*` con SVN.
+Prerequisito: PHPCS limpio (ver DRAPPS-293). Plan: GitHub Action que sincronice `trunk/` y `tags/v*` con SVN.
 
 ## Licencia
 

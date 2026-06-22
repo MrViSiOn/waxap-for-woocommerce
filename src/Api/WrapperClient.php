@@ -270,6 +270,24 @@ final class WrapperClient {
 	}
 
 	/**
+	 * Devuelve los contadores de envío agregados del tenant: totales por estado
+	 * y desglose de los omitidos por motivo (skipReason).
+	 *
+	 * @param int $days Ventana temporal en días (1-365).
+	 * @return array{windowDays:int, totals:array<string,int>, skipReasons:array<string,int>}|WP_Error
+	 */
+	public function get_message_stats( int $days = 30 ): array|WP_Error {
+		return $this->request(
+			'GET',
+			'/v1/messages/stats',
+			query: [
+				'days' => (string) $days,
+			],
+			auth: true
+		);
+	}
+
+	/**
 	 * Lista las conversaciones WhatsApp de la bandeja de entrada del tenant.
 	 *
 	 * @param int $limit  Número máximo de conversaciones a devolver.

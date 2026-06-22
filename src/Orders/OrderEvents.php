@@ -93,6 +93,22 @@ final class OrderEvents {
 		if ( ! is_wp_error( $result ) ) {
 			$order->update_meta_data( $sent_meta, '1' );
 			$order->save();
+			return;
+		}
+
+		// No silenciar el fallo: dejar traza en WooCommerce → Estado → Registros (source "waxap").
+		// El meta de idempotencia NO se marca, de modo que un reintento manual del estado
+		// volverá a intentar el envío.
+		if ( function_exists( 'wc_get_logger' ) ) {
+			wc_get_logger()->error(
+				sprintf(
+					'Fallo al notificar el pedido #%1$d (estado "%2$s"): %3$s',
+					$order_id,
+					$to_status,
+					$result->get_error_message()
+				),
+				[ 'source' => 'waxap' ]
+			);
 		}
 	}
 

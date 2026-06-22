@@ -214,6 +214,9 @@ final class AdminMenu {
 			$result = $client->get_message_log( $limit, $offset );
 			$log    = is_wp_error( $result ) ? null : $result;
 			$error  = is_wp_error( $result ) ? $result->get_error_message() : null;
+
+			$stats_result = $client->get_message_stats();
+			$stats        = is_wp_error( $stats_result ) ? null : $stats_result;
 			include __DIR__ . '/views/tab-history.php';
 			return;
 		}
