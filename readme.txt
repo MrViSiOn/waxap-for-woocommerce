@@ -4,7 +4,7 @@ Tags: woocommerce, whatsapp, notifications, order-status, transactional-messagin
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.4.2
+Stable tag: 0.4.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,10 @@ The plugin is free. The SaaS service has a free 14-day trial and paid plans from
 The plugin sends order metadata (order ID, status) and customer phone numbers to the Waxap SaaS service (api.waxap.shop). Customer phone numbers are only transmitted when the customer has opted in via the checkout consent checkbox.
 
 == Changelog ==
+
+= 0.4.3 =
+* New: The History tab now explains why a notification was skipped (no opt-in, monthly quota exceeded, outside the 24h window, no template) in plain language, plus send counters for the last 30 days and an "upgrade plan" call-to-action when the quota is exhausted.
+* Fix: Linking a WhatsApp number no longer shows a false "session failed" message during the brief reconnect right after scanning the QR.
 
 = 0.4.2 =
 * Fix: Plugin icon now shows correctly in the WordPress updates screen (using waxap.shop favicon via PUC filter).
