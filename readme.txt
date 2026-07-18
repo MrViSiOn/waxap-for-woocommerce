@@ -4,7 +4,7 @@ Tags: woocommerce, whatsapp, notifications, order-status, transactional-messagin
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.4.5
+Stable tag: 0.4.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,9 @@ The plugin is free. The SaaS service has a free 14-day trial and paid plans from
 The plugin sends order metadata (order ID, status) and customer phone numbers to the Waxap SaaS service (api.waxap.shop). Customer phone numbers are only transmitted when the customer has opted in via the checkout consent checkbox.
 
 == Changelog ==
+
+= 0.4.6 =
+* Change: Hidden the "Messages" (inbox) tab. Incoming messages showed the raw phone number, which doesn't match the merchant's saved contacts and caused confusion. The feature may return in a future version.
 
 = 0.4.5 =
 * Fix: "Visit plugin site" link now points to https://waxap.shop instead of a placeholder domain.
