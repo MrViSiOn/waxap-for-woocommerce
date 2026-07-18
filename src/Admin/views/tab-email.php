@@ -8,6 +8,8 @@
  * @var bool   $email_enabled
  * @var string $email_text
  * @var string $email_prefill
+ * @var bool   $contact_enabled
+ * @var bool   $has_phone
  */
 
 declare(strict_types=1);
@@ -99,6 +101,27 @@ if ( isset( $_GET['updated'] ) ) : ?>
 				</div>
 			</div>
 		</div>
+	</div>
+
+	<div class="wan-field-group" style="margin-top:24px;">
+		<label class="wan-status-card" for="wan-contact-enabled" style="max-width:620px;">
+			<div class="wan-status-info">
+				<strong><?php esc_html_e( 'Mostrar también en el checkout y la página de gracias', 'waxap-for-woocommerce' ); ?></strong>
+				<span><?php esc_html_e( 'Añade el mismo botón wa.me tras el formulario de pago y en la confirmación del pedido. Usa el texto y el mensaje configurados arriba.', 'waxap-for-woocommerce' ); ?></span>
+			</div>
+			<div class="wan-toggle">
+				<input
+					type="checkbox"
+					id="wan-contact-enabled"
+					name="contact_button_enabled"
+					value="1"
+					class="wan-toggle-input"
+					<?php checked( $contact_enabled ); ?>
+				>
+				<span class="wan-toggle-track"></span>
+				<span class="wan-toggle-thumb"></span>
+			</div>
+		</label>
 	</div>
 
 	<div class="wan-email-preview-wrap">

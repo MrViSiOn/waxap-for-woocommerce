@@ -195,10 +195,11 @@ final class AdminMenu {
 		}
 
 		if ( 'email' === $tab ) {
-			$email_enabled = '1' === Settings::get( 'email_button_enabled' );
-			$email_text    = Settings::get( 'email_button_text' );
-			$email_prefill = Settings::get( 'email_button_prefill' );
-			$has_phone     = ( '' !== Settings::get( 'phone_number' ) );
+			$email_enabled   = '1' === Settings::get( 'email_button_enabled' );
+			$email_text      = Settings::get( 'email_button_text' );
+			$email_prefill   = Settings::get( 'email_button_prefill' );
+			$contact_enabled = '1' === Settings::get( 'contact_button_enabled' );
+			$has_phone       = ( '' !== Settings::get( 'phone_number' ) );
 			include __DIR__ . '/views/tab-email.php';
 			return;
 		}
@@ -291,6 +292,7 @@ final class AdminMenu {
 		Settings::set( 'email_button_enabled', isset( $_POST['email_button_enabled'] ) ? '1' : '0' );
 		Settings::set( 'email_button_text', sanitize_text_field( wp_unslash( (string) ( $_POST['email_button_text'] ?? '' ) ) ) );
 		Settings::set( 'email_button_prefill', sanitize_textarea_field( wp_unslash( (string) ( $_POST['email_button_prefill'] ?? '' ) ) ) );
+		Settings::set( 'contact_button_enabled', isset( $_POST['contact_button_enabled'] ) ? '1' : '0' );
 
 		wp_safe_redirect(
 			add_query_arg(
