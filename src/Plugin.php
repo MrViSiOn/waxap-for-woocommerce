@@ -20,6 +20,7 @@ use WaNotifier\Ajax\InboxAjax;
 use WaNotifier\Ajax\SessionAjax;
 use WaNotifier\Api\WrapperClient;
 use WaNotifier\Checkout\CheckoutOptIn;
+use WaNotifier\Checkout\ContactButton;
 use WaNotifier\Emails\OrderEmails;
 use WaNotifier\Orders\OrderEvents;
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
@@ -79,6 +80,7 @@ final class Plugin {
 			( new OrderEvents() )->register();
 			$order_emails->register();
 			( new CheckoutOptIn() )->register();
+			( new ContactButton() )->register();
 		};
 
 		// WooCommerce 10+ dispara woocommerce_loaded en plugins_loaded con prioridad -1,
