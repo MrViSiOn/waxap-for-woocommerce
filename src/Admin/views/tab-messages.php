@@ -35,30 +35,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php if ( empty( $conversations ) ) : ?>
 					<div class="waxap-conv-empty"><?php esc_html_e( 'Sin conversaciones todavía.', 'waxap-for-woocommerce' ); ?></div>
 				<?php else : ?>
-					<?php foreach ( $conversations as $conv ) : ?>
+					<?php foreach ( $conversations as $waxap_conv ) : ?>
 						<?php
-						$phone       = (string) ( $conv['phone'] ?? '' );
-						$unread      = (int) ( $conv['unreadCount'] ?? 0 );
-						$last_msg    = is_array( $conv['lastMessage'] ?? null ) ? $conv['lastMessage'] : null;
-						$preview_raw = $last_msg ? (string) ( $last_msg['body'] ?? '' ) : '';
-						$preview     = mb_strlen( $preview_raw ) > 45
-							? mb_substr( $preview_raw, 0, 45 ) . '…'
-							: ( $preview_raw ?: '—' );
-						$time_iso    = $last_msg ? (string) ( $last_msg['createdAt'] ?? '' ) : '';
-						$initial     = mb_strtoupper( mb_substr( $phone, 0, 1 ) );
+						$waxap_phone       = (string) ( $waxap_conv['phone'] ?? '' );
+						$waxap_unread      = (int) ( $waxap_conv['unreadCount'] ?? 0 );
+						$waxap_last_msg    = is_array( $waxap_conv['lastMessage'] ?? null ) ? $waxap_conv['lastMessage'] : null;
+						$waxap_preview_raw = $waxap_last_msg ? (string) ( $waxap_last_msg['body'] ?? '' ) : '';
+						if ( mb_strlen( $waxap_preview_raw ) > 45 ) {
+							$waxap_preview = mb_substr( $waxap_preview_raw, 0, 45 ) . '…';
+						} else {
+							$waxap_preview = '' !== $waxap_preview_raw ? $waxap_preview_raw : '—';
+						}
+						$waxap_time_iso = $waxap_last_msg ? (string) ( $waxap_last_msg['createdAt'] ?? '' ) : '';
+						$waxap_initial  = mb_strtoupper( mb_substr( $waxap_phone, 0, 1 ) );
 						?>
-						<div class="waxap-conv-item" data-phone="<?php echo esc_attr( $phone ); ?>">
-							<div class="waxap-conv-avatar"><?php echo esc_html( $initial ); ?></div>
+						<div class="waxap-conv-item" data-phone="<?php echo esc_attr( $waxap_phone ); ?>">
+							<div class="waxap-conv-avatar"><?php echo esc_html( $waxap_initial ); ?></div>
 							<div class="waxap-conv-info">
-								<div class="waxap-conv-phone">+<?php echo esc_html( preg_replace( '/@[a-z.]+$/i', '', $phone ) ); ?></div>
-								<div class="waxap-conv-preview"><?php echo esc_html( $preview ); ?></div>
+								<div class="waxap-conv-phone">+<?php echo esc_html( preg_replace( '/@[a-z.]+$/i', '', $waxap_phone ) ); ?></div>
+								<div class="waxap-conv-preview"><?php echo esc_html( $waxap_preview ); ?></div>
 							</div>
 							<div class="waxap-conv-meta">
-								<?php if ( $time_iso ) : ?>
-									<span class="waxap-conv-time" data-iso="<?php echo esc_attr( $time_iso ); ?>"></span>
+								<?php if ( $waxap_time_iso ) : ?>
+									<span class="waxap-conv-time" data-iso="<?php echo esc_attr( $waxap_time_iso ); ?>"></span>
 								<?php endif; ?>
-								<?php if ( $unread > 0 ) : ?>
-									<span class="waxap-unread-badge"><?php echo esc_html( (string) $unread ); ?></span>
+								<?php if ( $waxap_unread > 0 ) : ?>
+									<span class="waxap-unread-badge"><?php echo esc_html( (string) $waxap_unread ); ?></span>
 								<?php endif; ?>
 							</div>
 						</div>

@@ -70,6 +70,7 @@ final class OrderEvents {
 			'customerName'  => $name,
 			'whatsappOptIn' => $opt_in,
 			'siteUrl'       => home_url(),
+			'platform'      => 'woocommerce',
 		];
 
 		$message = $this->resolve_template( $order, $to_status );

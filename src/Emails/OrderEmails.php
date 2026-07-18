@@ -57,8 +57,9 @@ final class OrderEmails {
 		if ( $sent_to_admin || $plain_text ) {
 			return;
 		}
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped — already escaped inside build_button_html.
-		echo $this->build_button_html( (string) $order->get_order_number() );
+		// build_button_html ya escapa los datos dinámicos (esc_url/esc_html); wp_kses_post
+		// sanea además la estructura HTML estática para satisfacer el estándar de salida.
+		echo wp_kses_post( $this->build_button_html( (string) $order->get_order_number() ) );
 	}
 
 	/**
