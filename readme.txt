@@ -4,7 +4,7 @@ Tags: woocommerce, whatsapp, notifications, order-status, transactional-messagin
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.4.3
+Stable tag: 0.4.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,9 @@ The plugin is free. The SaaS service has a free 14-day trial and paid plans from
 The plugin sends order metadata (order ID, status) and customer phone numbers to the Waxap SaaS service (api.waxap.shop). Customer phone numbers are only transmitted when the customer has opted in via the checkout consent checkbox.
 
 == Changelog ==
+
+= 0.4.4 =
+* Internal: order events now report their source platform (woocommerce) to the backend for per-platform metrics. No change in behaviour for merchants.
 
 = 0.4.3 =
 * New: The History tab now explains why a notification was skipped (no opt-in, monthly quota exceeded, outside the 24h window, no template) in plain language, plus send counters for the last 30 days and an "upgrade plan" call-to-action when the quota is exhausted.
