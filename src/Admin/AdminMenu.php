@@ -35,7 +35,6 @@ final class AdminMenu {
 		'notifications' => 'Notificaciones',
 		'email'         => 'Email branding',
 		'history'       => 'Historial',
-		'messages'      => 'Mensajes',
 	];
 
 	/** Registra el submenú de Waxap bajo WooCommerce. */
@@ -221,14 +220,10 @@ final class AdminMenu {
 			return;
 		}
 
-		if ( 'messages' === $tab ) {
-			$client        = new WrapperClient();
-			$result        = $client->get_inbox_conversations( 30 );
-			$conversations = is_wp_error( $result ) ? null : ( $result['data'] ?? [] );
-			$error         = is_wp_error( $result ) ? $result->get_error_message() : null;
-			include __DIR__ . '/views/tab-messages.php';
-			return;
-		}
+		// La pestaña "Mensajes" (bandeja de entrada) está oculta desde 0.4.6: el
+		// número entrante en crudo no casa con los contactos del comerciante y
+		// confunde. El código (tab-messages.php, InboxAjax, get_inbox_conversations)
+		// se conserva por si se reactiva más adelante.
 
 		$view = __DIR__ . '/views/tab-' . $tab . '.php';
 		if ( file_exists( $view ) ) {
